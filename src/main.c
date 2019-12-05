@@ -216,25 +216,25 @@ static void sample_main(void) {
                 }
 
                 switch (G_io_apdu_buffer[1]) {
-                case INS_SIGN: {
-                    if ((G_io_apdu_buffer[2] != P1_MORE) &&
-                        (G_io_apdu_buffer[2] != P1_LAST)) {
-                        THROW(0x6A86);
-                    }
-                    if (hashTainted) {
-                        cx_sha256_init(&hash);
-                        hashTainted = 0;
-                    }
-                    // Wait for the UI to be completed
-                    current_text_pos = 0;
-                    text_y = 60;
-                    G_io_apdu_buffer[5 + G_io_apdu_buffer[4]] = '\0';
-
-                    display_text_part();
-                    ui_text();
-
-                    flags |= IO_ASYNCH_REPLY;
-                } break;
+//                case INS_SIGN: {
+//                    if ((G_io_apdu_buffer[2] != P1_MORE) &&
+//                        (G_io_apdu_buffer[2] != P1_LAST)) {
+//                        THROW(0x6A86);
+//                    }
+//                    if (hashTainted) {
+//                        cx_sha256_init(&hash);
+//                        hashTainted = 0;
+//                    }
+//                    // Wait for the UI to be completed
+//                    current_text_pos = 0;
+//                    text_y = 60;
+//                    G_io_apdu_buffer[5 + G_io_apdu_buffer[4]] = '\0';
+//
+//                    display_text_part();
+//                    ui_text();
+//
+//                    flags |= IO_ASYNCH_REPLY;
+//                } break;
 
                 case INS_GET_PUBLIC_KEY: {
                     cx_ecfp_public_key_t publicKey;
