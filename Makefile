@@ -78,6 +78,8 @@ load: all
 delete:
 	python -m ledgerblue.deleteApp $(COMMON_DELETE_PARAMS)
 
-# Import generic rules from the SDK
 
+
+include $(BOLOS_SDK)/Makefile.glyphs
 include $(BOLOS_SDK)/Makefile.rules
+dep/%.d: %.c Makefile

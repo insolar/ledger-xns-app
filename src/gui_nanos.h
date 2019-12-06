@@ -15,109 +15,32 @@
 //
 
 #include "ux.h"
+#include "glyphs.h"
 
-static char lineBuffer[50];
+static const ux_menu_entry_t menu_main[];
 
-
-static const bagl_element_t bagl_ui_idle_nanos[] = {
-        // {
-        //     {type, userid, x, y, width, height, stroke, radius, fill, fgcolor,
-        //      bgcolor, font_id, icon_id},
-        //     text,
-        //     touch_area_brim,
-        //     overfgcolor,
-        //     overbgcolor,
-        //     tap,
-        //     out,
-        //     over,
-        // },
+static const ux_menu_entry_t menu_about[] = {
         {
-                {BAGL_RECTANGLE, 0x00, 0, 0, 128, 32, 0, 0, BAGL_FILL, 0x000000,
-                                                                         0xFFFFFF, 0, 0},
-                NULL,
+                .menu     = NULL,
+                .callback = NULL,
+                .userid   = 0,
+                .icon     = NULL,
+                .line1    = "Version",
+                .line2    = APPVERSION,
+                .text_x   = 0,
+                .icon_x   = 0,
         },
-        {
-                {BAGL_LABELINE, 0x02, 0, 12, 128, 11, 0, 0, 0, 0xFFFFFF, 0x000000,
-                                                                                   BAGL_FONT_OPEN_SANS_REGULAR_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
-                "Waiting for message",
-        },
-        {
-                {BAGL_ICON, 0x00, 3, 12, 7, 7, 0, 0, 0, 0xFFFFFF, 0x000000, 0,
-                        BAGL_GLYPH_ICON_CROSS},
-                NULL,
-        },
+        {menu_main, NULL, 0, &C_icon_back, "Back", NULL, 61, 40},
+        UX_MENU_END,
 };
 
-static const bagl_element_t bagl_ui_approval_nanos[] = {
-        // {
-        //     {type, userid, x, y, width, height, stroke, radius, fill, fgcolor,
-        //      bgcolor, font_id, icon_id},
-        //     text,
-        //     touch_area_brim,
-        //     overfgcolor,
-        //     overbgcolor,
-        //     tap,
-        //     out,
-        //     over,
-        // },
-        {
-                {BAGL_RECTANGLE, 0x00, 0, 0, 128, 32, 0, 0, BAGL_FILL, 0x000000,
-                                                                         0xFFFFFF, 0, 0},
-                NULL,
-        },
-        {
-                {BAGL_LABELINE, 0x02, 0, 12, 128, 11, 0, 0, 0, 0xFFFFFF, 0x000000,
-                                                                                   BAGL_FONT_OPEN_SANS_REGULAR_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
-                "Sign message",
-        },
-        {
-                {BAGL_ICON, 0x00, 3, 12, 7, 7, 0, 0, 0, 0xFFFFFF, 0x000000, 0,
-                        BAGL_GLYPH_ICON_CROSS},
-                NULL,
-        },
-        {
-                {BAGL_ICON, 0x00, 117, 13, 8, 6, 0, 0, 0, 0xFFFFFF, 0x000000, 0,
-                        BAGL_GLYPH_ICON_CHECK},
-                NULL,
-        },
+static const ux_menu_entry_t menu_main[] = {
+        {NULL, NULL, 0, NULL, "Waiting for", "commands...", 0, 0},
+        {menu_about, NULL, 0, NULL, "About", NULL, 0, 0},
+        {NULL, os_sched_exit, 0, &C_icon_dashboard, "Quit app", NULL, 50, 29},
+        UX_MENU_END,
 };
 
-
-static const bagl_element_t bagl_ui_text_review_nanos[] = {
-        // {
-        //     {type, userid, x, y, width, height, stroke, radius, fill, fgcolor,
-        //      bgcolor, font_id, icon_id},
-        //     text,
-        //     touch_area_brim,
-        //     overfgcolor,
-        //     overbgcolor,
-        //     tap,
-        //     out,
-        //     over,
-        // },
-        {
-                {BAGL_RECTANGLE, 0x00, 0, 0, 128, 32, 0, 0, BAGL_FILL, 0x000000,
-                                                                         0xFFFFFF, 0, 0},
-                NULL,
-        },
-        {
-                {BAGL_LABELINE, 0x02, 0, 12, 128, 11, 0, 0, 0, 0xFFFFFF, 0x000000,
-                                                                                   BAGL_FONT_OPEN_SANS_REGULAR_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
-                "Verify text",
-        },
-        {
-                {BAGL_LABELINE, 0x02, 23, 26, 82, 11, 0x80 | 10, 0, 0, 0xFFFFFF,
-                                                                         0x000000, BAGL_FONT_OPEN_SANS_EXTRABOLD_11px | BAGL_FONT_ALIGNMENT_CENTER, 26},
-                lineBuffer,
-        },
-        {
-                {BAGL_ICON, 0x00, 3, 12, 7, 7, 0, 0, 0, 0xFFFFFF, 0x000000, 0,
-                        BAGL_GLYPH_ICON_CROSS},
-                NULL,
-        },
-        {
-                {BAGL_ICON, 0x00, 117, 13, 8, 6, 0, 0, 0, 0xFFFFFF, 0x000000, 0,
-                        BAGL_GLYPH_ICON_CHECK},
-                NULL,
-        },
-};
+void ui_idle(void) {
+    UX_MENU_DISPLAY(0, menu_main, NULL);
+}
