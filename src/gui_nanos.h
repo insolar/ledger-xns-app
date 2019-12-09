@@ -14,33 +14,7 @@
 // limitations under the License.
 //
 
-#include "ux.h"
-#include "glyphs.h"
 
-static const ux_menu_entry_t menu_main[];
 
-static const ux_menu_entry_t menu_about[] = {
-        {
-                .menu     = NULL,
-                .callback = NULL,
-                .userid   = 0,
-                .icon     = NULL,
-                .line1    = "Version",
-                .line2    = APPVERSION,
-                .text_x   = 0,
-                .icon_x   = 0,
-        },
-        {menu_main, NULL, 0, &C_icon_back, "Back", NULL, 61, 40},
-        UX_MENU_END,
-};
-
-static const ux_menu_entry_t menu_main[] = {
-        {NULL, NULL, 0, NULL, "Waiting for", "commands...", 0, 0},
-        {menu_about, NULL, 0, NULL, "About", NULL, 0, 0},
-        {NULL, os_sched_exit, 0, &C_icon_dashboard, "Quit app", NULL, 50, 29},
-        UX_MENU_END,
-};
-
-void ui_idle(void) {
-    UX_MENU_DISPLAY(0, menu_main, NULL);
-}
+void gui_init();
+void gui_idle_show(unsigned int ignored);

@@ -14,6 +14,10 @@
 // limitations under the License.
 //
 
+#include <stdint.h>
+#include <stdbool.h>
+#include <os_io_seproxyhal.h>
+
 #include "os.h"
 #include "cx.h"
 
@@ -76,87 +80,36 @@ static handler_fn_t* getEnumeratedHandler(unsigned char ins) {
 }
 
 
-static void app_exit(void) {
-    BEGIN_TRY_L(exit) {
-        TRY_L(exit) {
-            os_sched_exit(-1);
-        }
-        FINALLY_L(exit) {
-        }
-    }
-    END_TRY_L(exit);
+//////////////////
+
+void app_init() {
+    io_seproxyhal_init();
+    USB_power(0);
+    USB_power(1);
+    gui_idle_show(0);
 }
 
 
-static void main_loop(void) {
-    volatile unsigned int rx = 0;
-    volatile unsigned int tx = 0;
-    volatile unsigned int flags = 0;
-
-    for (;;) {
-        volatile unsigned short sw = 0;
-
-        BEGIN_TRY {
-            TRY {
-                rx = tx;
-                tx = 0;
-                rx = io_exchange(CHANNEL_APDU | flags, rx);
-                flags = 0;
-
-                if (rx == 0)  THROW(EXCEPTION_IO_RESET);
-                if (G_io_apdu_buffer[OFFSET_CLA] != CLA) THROW(0x6E00);
-
-                handler_fn_t *handlerFn = getEnumeratedHandler(G_io_apdu_buffer[OFFSET_INS]);
-                if (!handlerFn) THROW(0x6D00);
-
-                handlerFn(G_io_apdu_buffer[OFFSET_P1], G_io_apdu_buffer[OFFSET_P2],
-                        G_io_apdu_buffer + OFFSET_CDATA, G_io_apdu_buffer[OFFSET_LC], &flags, &tx);
-            }
-            CATCH(EXCEPTION_IO_RESET) {
-                THROW(EXCEPTION_IO_RESET);
-            }
-            CATCH_OTHER(e) {
-                switch (e & 0xF000) {
-                    case 0x6000:
-                    case 0x9000:
-                        sw = e;
-                        break;
-                    default:
-                        sw = 0x6800 | (e & 0x7FF);
-                        break;
-                }
-                G_io_apdu_buffer[tx++] = sw >> 8;
-                G_io_apdu_buffer[tx++] = sw & 0xFF;
-            }
-            FINALLY {
-            }
-        }
-        END_TRY;
-    }
-}
-
-
-__attribute__((section(".boot"))) int main(void) {
+__attribute__((section(".boot"))) int
+main(void) {
+    // exit critical section
     __asm volatile("cpsie i");
 
-    for (;;) {
-        UX_INIT();
-        os_boot();
-        BEGIN_TRY {
-            TRY {
-                io_seproxyhal_init();
-                USB_power(0);
-                USB_power(1);
-                ui_idle();
-                main_loop();
-            }
-            CATCH(EXCEPTION_IO_RESET) { continue; }
-            CATCH_ALL { break; }
-            FINALLY { }
+    gui_init();
+    os_boot();
+
+    BEGIN_TRY
+        {
+            TRY
+                {
+                    app_init();
+                    app_main();
+                }
+            CATCH_OTHER(e)
+                {}
+            FINALLY
+            {}
         }
-        END_TRY;
-    }
-    app_exit();
-    return 0;
+    END_TRY;
 }
 

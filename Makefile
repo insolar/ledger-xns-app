@@ -24,11 +24,12 @@ include $(BOLOS_SDK)/Makefile.defines
 APPNAME = "Insolar"
 APPVERSION = 1.0.0
 APP_LOAD_PARAMS = --appFlags 0x00 $(COMMON_LOAD_PARAMS) --path "44'/453'" --curve secp256k1
+ICONNAME:=$(CURDIR)/icon.gif
 
 # Build configuration
 
 APP_SOURCE_PATH += src
-SDK_SOURCE_PATH += lib_stusb lib_stusb_impl
+SDK_SOURCE_PATH += lib_stusb lib_stusb_impl lib_ux
 
 DEFINES += APPVERSION=\"$(APPVERSION)\"
 
@@ -38,7 +39,7 @@ DEFINES += PRINTF\(...\)=
 
 DEFINES += HAVE_IO_USB HAVE_L4_USBLIB IO_USB_MAX_ENDPOINTS=7 IO_HID_EP_LENGTH=64 HAVE_USB_APDU
 
-DEFINES += CX_COMPLIANCE_141
+DEFINES += CX_COMPLIANCE_141 HAVE_UX_FLOW
 
 # Compiler, assembler, and linker
 
@@ -82,4 +83,3 @@ delete:
 
 include $(BOLOS_SDK)/Makefile.glyphs
 include $(BOLOS_SDK)/Makefile.rules
-dep/%.d: %.c Makefile
