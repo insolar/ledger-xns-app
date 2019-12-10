@@ -1,6 +1,6 @@
 /*******************************************************************************
+*   (c) 2018,2019 ZondaX GmbH
 *   (c) 2016 Ledger
-*   (c) 2018, 2019 ZondaX GmbH
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -14,30 +14,29 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 ********************************************************************************/
-#include "app_main.h"
-#include "view.h"
+#pragma once
 
-#include <os_io_seproxyhal.h>
+#include <stdint.h>
 
-__attribute__((section(".boot"))) int
-main(void) {
-    // exit critical section
-    __asm volatile("cpsie i");
+#if defined(LEDGER_SPECIFIC)
+#include "bolos_target.h"
+#if defined(BOLOS_SDK)
+#include "os.h"
+#include "cx.h"
+#endif
+#endif
 
-    view_init();
-    os_boot();
+/// view_init (initializes UI)
+void view_init();
 
-    BEGIN_TRY
-    {
-        TRY
-        {
-            app_init();
-            app_main();
-        }
-        CATCH_OTHER(e)
-        {}
-        FINALLY
-        {}
-    }
-    END_TRY;
-}
+/// view_idle_show (idle view - main menu + status)
+void view_idle_show(unsigned int ignored);
+
+/// view_error (error view)
+void view_error_show();
+
+// shows address in the screen
+void view_address_show();
+
+// Shows review screen + later sign menu
+void view_sign_show();

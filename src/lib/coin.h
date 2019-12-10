@@ -1,6 +1,5 @@
 /*******************************************************************************
-*   (c) 2016 Ledger
-*   (c) 2018, 2019 ZondaX GmbH
+*  (c) 2019 ZondaX GmbH
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -14,30 +13,21 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 ********************************************************************************/
-#include "app_main.h"
-#include "view.h"
+#pragma once
 
-#include <os_io_seproxyhal.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-__attribute__((section(".boot"))) int
-main(void) {
-    // exit critical section
-    __asm volatile("cpsie i");
+#include <stdint.h>
+#include <stddef.h>
 
-    view_init();
-    os_boot();
+#define BIP44_0_DEFAULT     (0x80000000 | 0x2c)
+#define BIP44_1_DEFAULT     (0x80000000 | 0x76)     // FIXME: Change derivation path
+#define BIP44_2_DEFAULT     (0x80000000 | 0)
+#define BIP44_3_DEFAULT     (0)
+#define BIP44_4_DEFAULT     (0)
 
-    BEGIN_TRY
-    {
-        TRY
-        {
-            app_init();
-            app_main();
-        }
-        CATCH_OTHER(e)
-        {}
-        FINALLY
-        {}
-    }
-    END_TRY;
+#ifdef __cplusplus
 }
+#endif

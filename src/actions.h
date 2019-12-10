@@ -1,6 +1,6 @@
 /*******************************************************************************
 *   (c) 2016 Ledger
-*   (c) 2018, 2019 ZondaX GmbH
+*   (c) 2019 ZondaX GmbH
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -14,30 +14,16 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 ********************************************************************************/
-#include "app_main.h"
-#include "view.h"
+#pragma once
 
-#include <os_io_seproxyhal.h>
+#include <stdint.h>
 
-__attribute__((section(".boot"))) int
-main(void) {
-    // exit critical section
-    __asm volatile("cpsie i");
+uint8_t app_sign();
 
-    view_init();
-    os_boot();
+void app_set_hrp(char *p);
 
-    BEGIN_TRY
-    {
-        TRY
-        {
-            app_init();
-            app_main();
-        }
-        CATCH_OTHER(e)
-        {}
-        FINALLY
-        {}
-    }
-    END_TRY;
-}
+uint8_t app_fill_address();
+
+void app_reply_address();
+
+void app_reply_error();

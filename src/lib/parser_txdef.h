@@ -1,6 +1,5 @@
 /*******************************************************************************
-*   (c) 2016 Ledger
-*   (c) 2018, 2019 ZondaX GmbH
+*  (c) 2019 ZondaX GmbH
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -14,30 +13,37 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 ********************************************************************************/
-#include "app_main.h"
-#include "view.h"
+#pragma once
 
-#include <os_io_seproxyhal.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-__attribute__((section(".boot"))) int
-main(void) {
-    // exit critical section
-    __asm volatile("cpsie i");
+#include <stdint.h>
+#include <stddef.h>
 
-    view_init();
-    os_boot();
+typedef struct {
+    int16_t item_index;
+    int16_t chunk_index;
+    uint16_t item_index_current;
+    uint16_t item_index_root;
+    uint8_t max_level;
+    uint8_t max_depth;
 
-    BEGIN_TRY
-    {
-        TRY
-        {
-            app_init();
-            app_main();
-        }
-        CATCH_OTHER(e)
-        {}
-        FINALLY
-        {}
-    }
-    END_TRY;
+    char *out_key;
+    int16_t out_key_len;
+
+    char *out_val;
+    int16_t out_val_len;
+} tx_query_t;
+
+typedef struct {
+    parsed_json_t json;
+    const char *tx;
+    uint8_t cache_valid;
+    tx_query_t query;
+} parser_tx_t;
+
+#ifdef __cplusplus
 }
+#endif

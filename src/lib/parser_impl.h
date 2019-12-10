@@ -1,6 +1,5 @@
 /*******************************************************************************
-*   (c) 2016 Ledger
-*   (c) 2018, 2019 ZondaX GmbH
+*  (c) 2019 ZondaX GmbH
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -14,30 +13,24 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 ********************************************************************************/
-#include "app_main.h"
-#include "view.h"
+#pragma once
 
-#include <os_io_seproxyhal.h>
+#include "parser_common.h"
+#include "json/json_parser.h"
+#include "parser_txdef.h"
 
-__attribute__((section(".boot"))) int
-main(void) {
-    // exit critical section
-    __asm volatile("cpsie i");
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    view_init();
-    os_boot();
+extern parser_tx_t parser_tx_obj;
 
-    BEGIN_TRY
-    {
-        TRY
-        {
-            app_init();
-            app_main();
-        }
-        CATCH_OTHER(e)
-        {}
-        FINALLY
-        {}
-    }
-    END_TRY;
+parser_error_t parser_init(parser_context_t *ctx,
+                           const uint8_t *buffer,
+                           uint16_t bufferSize);
+
+parser_error_t _readTx(parser_context_t *c, parser_tx_t *v);
+
+#ifdef __cplusplus
 }
+#endif

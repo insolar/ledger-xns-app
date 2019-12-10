@@ -1,18 +1,20 @@
+#*******************************************************************************
+#   Ledger App
+#   (c) 2017 Ledger
+#   (c) 2018 ZondaX GmbH
 #
-# Copyright 2019 Insolar Technologies GmbH
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#*******************************************************************************
 
 ifeq ($(BOLOS_SDK),)
 $(error BOLOS_SDK is not set)
@@ -20,26 +22,77 @@ endif
 include $(BOLOS_SDK)/Makefile.defines
 
 # Main app configuration
-
 APPNAME = "Insolar"
-APPVERSION = 1.0.0
-APP_LOAD_PARAMS = --appFlags 0x00 $(COMMON_LOAD_PARAMS) --path "44'/453'" --curve secp256k1
-ICONNAME:=$(CURDIR)/icon.gif
+APPVERSION_M=1
+APPVERSION_N=0
+APPVERSION_P=0
 
-# Build configuration
+APP_LOAD_PARAMS = --appFlags 0x200 --delete $(COMMON_LOAD_PARAMS) --path "44'/118'"
 
-APP_SOURCE_PATH += src
-SDK_SOURCE_PATH += lib_stusb lib_stusb_impl lib_ux
+ifeq ($(TARGET_NAME),TARGET_NANOS)
+SCRIPT_LD:=$(CURDIR)/script.ld
+ICONNAME:=$(CURDIR)/nanos_icon.gif
+endif
 
-DEFINES += APPVERSION=\"$(APPVERSION)\"
+ifeq ($(TARGET_NAME),TARGET_NANOX)
+ICONNAME:=$(CURDIR)/nanox_icon.gif
+endif
 
-DEFINES += OS_IO_SEPROXYHAL IO_SEPROXYHAL_BUFFER_SIZE_B=128
+ifndef ICONNAME
+$(error ICONNAME is not set)
+endif
+
+all: default
+
+############
+# Platform
+
+DEFINES   += UNUSED\(x\)=\(void\)x
+DEFINES   += PRINTF\(...\)=
+
+APPVERSION=$(APPVERSION_M).$(APPVERSION_N).$(APPVERSION_P)
+DEFINES   += APPVERSION=\"$(APPVERSION)\"
+
+DEFINES += OS_IO_SEPROXYHAL
 DEFINES += HAVE_BAGL HAVE_SPRINTF
-DEFINES += PRINTF\(...\)=
-
 DEFINES += HAVE_IO_USB HAVE_L4_USBLIB IO_USB_MAX_ENDPOINTS=7 IO_HID_EP_LENGTH=64 HAVE_USB_APDU
 
-DEFINES += CX_COMPLIANCE_141 HAVE_UX_FLOW
+DEFINES += LEDGER_MAJOR_VERSION=$(APPVERSION_M) LEDGER_MINOR_VERSION=$(APPVERSION_N) LEDGER_PATCH_VERSION=$(APPVERSION_P)
+
+DEFINES   += HAVE_U2F HAVE_IO_U2F
+DEFINES   += U2F_PROXY_MAGIC=\"CSM\"
+DEFINES   += USB_SEGMENT_SIZE=64
+DEFINES   += U2F_MAX_MESSAGE_SIZE=264 #257+5+2
+DEFINES   += HAVE_BOLOS_APP_STACK_CANARY
+
+WEBUSB_URL     = www.ledgerwallet.com
+DEFINES       += HAVE_WEBUSB WEBUSB_URL_SIZE_B=$(shell echo -n $(WEBUSB_URL) | wc -c) WEBUSB_URL=$(shell echo -n $(WEBUSB_URL) | sed -e "s/./\\\'\0\\\',/g")
+
+ifeq ($(TARGET_NAME),TARGET_NANOX)
+DEFINES += IO_SEPROXYHAL_BUFFER_SIZE_B=300
+
+DEFINES       += HAVE_GLO096
+DEFINES       += HAVE_BAGL BAGL_WIDTH=128 BAGL_HEIGHT=64
+DEFINES       += HAVE_BAGL_ELLIPSIS # long label truncation feature
+DEFINES       += HAVE_BAGL_FONT_OPEN_SANS_REGULAR_11PX
+DEFINES       += HAVE_BAGL_FONT_OPEN_SANS_EXTRABOLD_11PX
+DEFINES       += HAVE_BAGL_FONT_OPEN_SANS_LIGHT_16PX
+
+DEFINES          += HAVE_UX_FLOW
+
+#SDK_SOURCE_PATH  += lib_blewbxx lib_blewbxx_impl
+SDK_SOURCE_PATH  += lib_ux
+else
+# Assume Nano S
+DEFINES       += IO_SEPROXYHAL_BUFFER_SIZE_B=128
+DEFINES       += HAVE_BOLOS_UX COMPLIANCE_UX_160 HAVE_UX_LEGACY HAVE_UX_FLOW
+endif
+
+# X specific
+
+#Feature temporarily disabled
+DEFINES   += LEDGER_SPECIFIC
+#DEFINES += TESTING_ENABLED
 
 # Compiler, assembler, and linker
 
@@ -59,27 +112,38 @@ ifeq ($(GCCPATH),)
 $(info GCCPATH is not set: arm-none-eabi-* will be used from PATH)
 endif
 
+#########################
+
 CC := $(CLANGPATH)clang
 CFLAGS += -O3 -Os
 
 AS := $(GCCPATH)arm-none-eabi-gcc
 AFLAGS +=
 
-LD := $(GCCPATH)arm-none-eabi-gcc
-LDFLAGS += -O3 -Os
-LDLIBS += -lm -lgcc -lc
+LD       := $(GCCPATH)arm-none-eabi-gcc
+LDFLAGS  += -O3 -Os
+LDLIBS   += -lm -lgcc -lc
 
-# Main rules
+##########################
+include $(BOLOS_SDK)/Makefile.glyphs
 
-all: default
+APP_SOURCE_PATH += src deps/ledger-zxlib/include deps/ledger-zxlib/src deps/jsmn/src
+SDK_SOURCE_PATH += lib_stusb lib_u2f lib_stusb_impl
 
-load: all
-	python -m ledgerblue.loadApp $(APP_LOAD_PARAMS)
+#SDK_SOURCE_PATH  += lib_blewbxx lib_blewbxx_impl
+SDK_SOURCE_PATH  += lib_ux
+
+load:
+	sudo -E python -m ledgerblue.loadApp $(APP_LOAD_PARAMS)
 
 delete:
-	python -m ledgerblue.deleteApp $(COMMON_DELETE_PARAMS)
+	sudo -E python -m ledgerblue.deleteApp $(COMMON_DELETE_PARAMS)
 
-
-
-include $(BOLOS_SDK)/Makefile.glyphs
+# Import generic rules from the SDK
 include $(BOLOS_SDK)/Makefile.rules
+
+#add dependency on custom makefile filename
+dep/%.d: %.c Makefile
+
+listvariants:
+	@echo VARIANTS COIN cosmos
