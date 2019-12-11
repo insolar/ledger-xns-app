@@ -10,8 +10,8 @@ extern unsigned char const C_digit_dot_bitmap[];
         #endif // GLYPH_digit_dot_BPP
         #endif // OS_IO_SEPROXYHAL
 #ifndef GLYPH_icon_app_BPP
-        #define GLYPH_icon_app_WIDTH 16
-        #define GLYPH_icon_app_HEIGHT 16
+        #define GLYPH_icon_app_WIDTH 14
+        #define GLYPH_icon_app_HEIGHT 14
         #define GLYPH_icon_app_BPP 1
 extern unsigned int const C_icon_app_colors[];
 extern unsigned char const C_icon_app_bitmap[];
