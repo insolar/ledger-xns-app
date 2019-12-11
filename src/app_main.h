@@ -35,6 +35,8 @@
 #define INS_GET_VERSION                 0
 #define INS_SIGN_SECP256K1              2
 #define INS_GET_ADDR_SECP256K1          4
+#define INS_CREATE_WALLET               5
+
 
 void app_init();
 

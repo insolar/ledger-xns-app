@@ -213,6 +213,14 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                     break;
                 }
 
+                case INS_CREATE_WALLET: {
+                    // todo
+                    //const char *error_msg = create_wallet_parse();
+                    //view_create_wallet_show()
+                    *flags |= IO_ASYNCH_REPLY;
+                    break;
+                }
+
                 default:
                     THROW(APDU_CODE_INS_NOT_SUPPORTED);
             }
