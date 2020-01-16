@@ -3,7 +3,6 @@
 bin
 debug
 dep
-deps
 obj
 cmake-build-debug
 CMakeLists.txt

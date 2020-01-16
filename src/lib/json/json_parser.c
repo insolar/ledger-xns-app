@@ -217,8 +217,7 @@ int16_t object_get_nth_value(uint16_t object_token_index,
 int16_t object_get_value(const parsed_json_t *parsed_transaction,
                          uint16_t object_token_index,
                          const char *key_name) {
-    if (object_token_index < 0 || object_token_index > parsed_transaction->numberOfTokens) {
-        return -1;
+    if (object_token_index < 0 || object_token_index > parsed_transaction->numberOfTokens) {return -1;
     }
 
     const jsmntok_t object_token = parsed_transaction->tokens[object_token_index];

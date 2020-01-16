@@ -106,55 +106,30 @@ int8_t dictionaries_sorted(parsed_json_t *json) {
 }
 
 parser_error_t tx_validate(parsed_json_t *json) {
-    if (contains_whitespace(json) == 1) {
-        return parser_json_contains_whitespace;
-    }
+//    if (contains_whitespace(json) == 1) {
+//        return parser_json_contains_whitespace;
+//    }
 
-    if (dictionaries_sorted(json) != 1) {
-        return parser_json_is_not_sorted;
-    }
-
-    if (object_get_value(
-        json,
-        0,
-        "chain_id") == -1) {
-        return parser_json_missing_chain_id;
-    }
+//    if (dictionaries_sorted(json) != 1) {
+//        return parser_json_is_not_sorted;
+//    }
 
     if (object_get_value(
         json,
         0,
-        "sequence") == -1) {
-        return parser_json_missing_sequence;
-    }
-
-    if (object_get_value(
-        json,
-        0,
-        "fee") == -1) {
-        return parser_json_missing_fee;
-    }
-
-    if (object_get_value(
-        json,
-        0,
-        "msgs") == -1) {
-        return parser_json_missing_msgs;
-    }
-
-    if (object_get_value(
-        json,
-        0,
-        "account_number") == -1) {
-        return parser_json_missing_account_number;
-    }
-
-    if (object_get_value(
-        json,
-        0,
-        "memo") == -1) {
+        "amount") == -1) {
+//        "params/callParams/amount") == -1) {
         return parser_json_missing_memo;
     }
+
+    if (object_get_value(
+            json,
+            0,
+            "toMemberReference") == -1) {
+//            "params/callParams/toMemberReference") == -1) {
+        return parser_json_missing_memo;
+    }
+
 
     return parser_ok;
 }

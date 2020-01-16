@@ -63,19 +63,19 @@ The general structure of commands and responses is as follows:
 
 --------------
 
-### INS_GET_ADDR_ED25519
+### INS_GET_PUBLICKEY
 
 #### Command
 
 | Field      | Type           | Content                | Expected       |
 | ---------- | -------------- | ---------------------- | -------------- |
 | CLA        | byte (1)       | Application Identifier | 0x05           |
-| INS        | byte (1)       | Instruction ID         | 0x01           |
+| INS        | byte (1)       | Instruction ID         | 0x04           |
 | P1         | byte (1)       | Request User confirmation | No = 0      |
 | P2         | byte (1)       | Parameter 2            | ignored        |
 | L          | byte (1)       | Bytes in payload       | (depends)      |
 | Path[0]    | byte (4)       | Derivation Path Data   | 44             |
-| Path[1]    | byte (4)       | Derivation Path Data   | 123            |  # FIX SLIP0044
+| Path[1]    | byte (4)       | Derivation Path Data   | 453            |
 | Path[2]    | byte (4)       | Derivation Path Data   | ?              |
 | Path[3]    | byte (4)       | Derivation Path Data   | ?              |
 | Path[4]    | byte (4)       | Derivation Path Data   | ?              |
@@ -136,3 +136,9 @@ All other packets/chunks should contain message to sign
 | SW1-SW2 | byte (2)  | Return code | see list of return codes |
 
 --------------
+
+
+250 + 250 + 15
+{"jsonrpc":"2.0","id":1,"method":"contract.call","params":{"callSite":"member.transfer","callParams":{"amount":"550000000000","toMemberReference":"insolar:1AdHjF5J9CmGazFKqcsjw_Tjxfo9bInnewr0ZQ9VNaFA"},"publicKey":"-----BEGIN PUBLIC KEY-----\nMFYwEAY
+HKoZIzj0CAQYFK4EEAAoDQgAECSum1PSGjt7aKePxQy1Wc+4Qq+nk7bdu\nPER5B/vV2UpAxo5MR72eEqQQ2M8CKPICvOGzXWqfjVowsQWJXLIMmw==\n-----END PUBLIC KEY-----","reference":"insolar:1AfKI3TkFAsv4C2x_vkZrtRF17fsPSYG2CH7bQpeBx2I","seed":"nW/RudtU5f32/HwbSOROvUBwRzbk26Qb
+S3eI4v7HE1M="}}

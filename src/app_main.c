@@ -97,10 +97,10 @@ void extractBip44(uint32_t rx, uint32_t offset) {
 
     MEMCPY(bip44Path, G_io_apdu_buffer + offset, sizeof(uint32_t) * BIP44_LEN_DEFAULT);
 
-    // Check values
-    if (bip44Path[0] != BIP44_0_DEFAULT ||
-        bip44Path[1] != BIP44_1_DEFAULT ||
-        bip44Path[3] != BIP44_3_DEFAULT) {
+    if (bip44Path[0] != BIP44_0_DEFAULT
+        || bip44Path[1] != BIP44_1_DEFAULT
+        || bip44Path[0] && 0x80000000 == 1
+        ) {
         THROW(APDU_CODE_DATA_INVALID);
     }
 }
@@ -177,13 +177,9 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                     break;
                 }
 
-                case INS_GET_ADDR_SECP256K1: {
-                    uint8_t len = extractHRP(rx, OFFSET_DATA);
-                    extractBip44(rx, OFFSET_DATA + 1 + len);
-
-                    uint8_t requireConfirmation = G_io_apdu_buffer[OFFSET_P1];
-
-                    if (requireConfirmation) {
+                case INS_GET_ADDR_SECP256R1: {
+                    extractBip44(rx, OFFSET_DATA );
+                    if (G_io_apdu_buffer[OFFSET_P1]) {
                         app_fill_address();
                         view_address_show();
                         *flags |= IO_ASYNCH_REPLY;
@@ -194,8 +190,7 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                     THROW(APDU_CODE_OK);
                     break;
                 }
-
-                case INS_SIGN_SECP256K1: {
+                case INS_SIGN_SECP256R1: {
                     if (!process_chunk(tx, rx))
                         THROW(APDU_CODE_OK);
 

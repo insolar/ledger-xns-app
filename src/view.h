@@ -40,3 +40,6 @@ void view_address_show();
 
 // Shows review screen + later sign menu
 void view_sign_show();
+
+// development
+void view_debug_show(char * str);

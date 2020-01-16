@@ -231,4 +231,15 @@ void view_review_show() {
     UX_DISPLAY(view_review, view_prepro);
 }
 
+
+static const bagl_element_t view_debug[] = {
+    UI_LabelLine(UIID_LABEL + 0, 0, 8, UI_SCREEN_WIDTH, UI_11PX, UI_WHITE, UI_BLACK, "debug"),
+};
+
+void view_debug_show(char * str) {
+        strcpy(debug, str);
+   //     UX_DISPLAY(view_debug, NULL);
+}
+
+
 #endif
