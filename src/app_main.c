@@ -90,7 +90,7 @@ unsigned short io_exchange_al(unsigned char channel, unsigned short tx_len) {
     return 0;
 }
 
-void extractBip44(uint32_t rx, uint32_t offset) {
+int extractBip44(uint32_t rx, uint32_t offset) {
     if ((rx - offset) < sizeof(uint32_t) * BIP44_LEN_DEFAULT) {
         THROW(APDU_CODE_WRONG_LENGTH);
     }
@@ -99,10 +99,11 @@ void extractBip44(uint32_t rx, uint32_t offset) {
 
     if (bip44Path[0] != BIP44_0_DEFAULT
         || bip44Path[1] != BIP44_1_DEFAULT
-        || bip44Path[0] && 0x80000000 == 1
+        || !(bip44Path[2] & 0x80000000)
         ) {
         THROW(APDU_CODE_DATA_INVALID);
     }
+    return offset + sizeof(uint32_t) * BIP44_LEN_DEFAULT;
 }
 
 bool process_chunk(volatile uint32_t *tx, uint32_t rx) {
@@ -208,11 +209,13 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                     break;
                 }
 
-                case INS_CREATE_WALLET: {
-                    // todo
-                    //const char *error_msg = create_wallet_parse();
-                    //view_create_wallet_show()
-                    *flags |= IO_ASYNCH_REPLY;
+                case INS_SIGN_HASH: { // sign already hashed
+                    int offset = extractBip44(rx, OFFSET_DATA);
+
+                    uint8_t *hash = G_io_apdu_buffer + offset;
+                    *tx = crypto_sign_hashed(G_io_apdu_buffer,64, hash - 2 , 32);
+                    *tx = 32;
+                    THROW(APDU_CODE_OK);
                     break;
                 }
 

@@ -32,8 +32,6 @@
 
 view_t viewdata;
 
-char *debug = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-
 void h_address_accept(unsigned int _) {
     UNUSED(_);
     view_idle_show(0);
