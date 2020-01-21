@@ -72,8 +72,6 @@ uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t
     uint8_t privateKeyData[32];
     int signatureLength;
 
- //   uint8_t *buff = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
- //   const uint8_t const *HEX = "0123456789abcdef";
     BEGIN_TRY
     {
         TRY
@@ -92,7 +90,7 @@ uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t
                 signatureLength = cx_ecdsa_sign(&cx_privateKey,
                                                 CX_RND_RFC6979 | CX_LAST,
                                                 CX_SHA256,
-                                                message_digest,
+                                                message, // message_digest,
                                                 CX_SHA256_SIZE,
                                                 signature,
                                                 signatureMaxlen,
@@ -113,6 +111,9 @@ uint16_t crypto_sign_hashed(uint8_t *signature, uint16_t signatureMaxlen, const 
     uint8_t privateKeyData[32];
     int signatureLength;
 
+    uint8_t message_digest[CX_SHA256_SIZE];
+    SAFE_HEARTBEAT(cx_hash_sha256(message, messageLen, message_digest, CX_SHA256_SIZE));
+
     BEGIN_TRY
     {
         TRY
@@ -132,8 +133,8 @@ uint16_t crypto_sign_hashed(uint8_t *signature, uint16_t signatureMaxlen, const 
                 signatureLength = cx_ecdsa_sign(&cx_privateKey,
                                                 CX_RND_RFC6979 | CX_LAST,
                                                 CX_SHA256,
-                                                message,
-                                                messageLen,
+                                                message_digest,
+                                                CX_SHA256_SIZE,
                                                 signature,
                                                 signatureMaxlen,
                                                 &info));
