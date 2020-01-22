@@ -65,7 +65,7 @@ unsigned int crypto_extractPublicKey(uint32_t bip44Path[BIP44_LEN_DEFAULT], uint
 }
 
 uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t *message, uint16_t messageLen) {
-    uint8_t message_digest[CX_SHA256_SIZE];
+    uint8_t message_digest[CX_SHA256_SIZE+1];
     SAFE_HEARTBEAT(cx_hash_sha256(message, messageLen, message_digest, CX_SHA256_SIZE));
 
     cx_ecfp_private_key_t cx_privateKey;
@@ -105,50 +105,6 @@ uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t
 
     return signatureLength;
 }
-
-uint16_t crypto_sign_hashed(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t *message, uint16_t messageLen) {
-    cx_ecfp_private_key_t cx_privateKey;
-    uint8_t privateKeyData[32];
-    int signatureLength;
-
-    uint8_t message_digest[CX_SHA256_SIZE];
-    SAFE_HEARTBEAT(cx_hash_sha256(message, messageLen, message_digest, CX_SHA256_SIZE));
-
-    BEGIN_TRY
-    {
-        TRY
-        {
-            // Generate keys
-            SAFE_HEARTBEAT(os_perso_derive_node_bip32(CX_CURVE_256K1,
-                                                      bip44Path,
-                                                      BIP44_LEN_DEFAULT,
-                                                      privateKeyData, NULL));
-
-            SAFE_HEARTBEAT(cx_ecfp_init_private_key(CX_CURVE_256K1, privateKeyData, 32, &cx_privateKey));
-
-
-            // Sign
-            unsigned int info = 0;
-            SAFE_HEARTBEAT(
-                signatureLength = cx_ecdsa_sign(&cx_privateKey,
-                                                CX_RND_RFC6979 | CX_LAST,
-                                                CX_SHA256,
-                                                message_digest,
-                                                CX_SHA256_SIZE,
-                                                signature,
-                                                signatureMaxlen,
-                                                &info));
-        }
-        FINALLY {
-            MEMZERO(&cx_privateKey, sizeof(cx_privateKey));
-            MEMZERO(privateKeyData, 32);
-        }
-    }
-    END_TRY;
-
-    return signatureLength;
-}
-
 
 
 #else

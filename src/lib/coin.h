@@ -23,10 +23,7 @@ extern "C" {
 #include <stddef.h>
 
 #define BIP44_0_DEFAULT     (0x80000000 | 44)
-#define BIP44_1_DEFAULT     (0x80000000 | 453)     // FIXME: Change derivation path
-#define BIP44_2_DEFAULT     (0x80000000 | 0)
-#define BIP44_3_DEFAULT     (0)
-#define BIP44_4_DEFAULT     (0)
+#define BIP44_1_DEFAULT     (0x80000000 | 453)
 
 #ifdef __cplusplus
 }

@@ -194,8 +194,7 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                 case INS_SIGN_SECP256R1: {
                     if (!process_chunk(tx, rx))
                         THROW(APDU_CODE_OK);
-
-//                    const char *error_msg = tx_parse();
+                    //  const char *error_msg = tx_parse();
 //
 //                    if (error_msg != NULL) {
 //                        int error_msg_length = strlen(error_msg);
@@ -216,7 +215,7 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                     hash[32]=0;
                     int sl = crypto_sign(G_io_apdu_buffer,64, hash , 31);
                     *tx = 64;
-                    snprintf(G_io_apdu_buffer, 10, "[%d]", sl);
+                    snprintf((char*)G_io_apdu_buffer, 10, "[%d]", sl);
                     THROW(APDU_CODE_OK);
                     break;
                 }
@@ -335,18 +334,11 @@ void app_main() {
 
 /*
 go run main.go 55020000 14 2c000080 c5010080 00000080 00000080 00000080 ---  \
-               55020100 FA '{“jsonrpc”:“2.0",“id”:1,“method”:“contract.call”,“params”:{“callSite”:“member.transfer”,“callParams”:{“amount”:“550000000000”,“toMemberReference”:“insolar:1AdHjF5J9CmGazFKqcsjw_Tjxfo9bInnewr0ZQ9VNaFA”},“publicKey”:“-----BEGIN PUBLIC KEY-----\nMFYwEAY' --- \
-               55020100 FA 'HKoZIzj0CAQYFK4EEAAoDQgAECSum1PSGjt7aKePxQy1Wc+4Qq+nk7bdu\nPER5B/vV2UpAxo5MR72eEqQQ2M8CKPICvOGzXWqfjVowsQWJXLIMmw==\n-----END PUBLIC KEY-----“,”reference”:“insolar:1AfKI3TkFAsv4C2x_vkZrtRF17fsPSYG2CH7bQpeBx2I”,“seed”:“nW/RudtU5f32/HwbSOROvUBwRzbk26Qb' --- \
-               55020200 0F 'S3eI4v7HE1M=“}}'
+               55020100 FA '{"jsonrpc":"2.0","id":1,"method":"contract.call","params":{"callSite":"member.transfer","callParams":{"amount":"550000000000","toMemberReference":"insolar:1AdHjF5J9CmGazFKqcsjw_Tjxfo9bInnewr0ZQ9VNaFA"},"publicKey":"-----BEGIN PUBLIC KEY-----\\nMFYwEAY' --- \
+               55020100 FA 'HKoZIzj0CAQYFK4EEAAoDQgAECSum1PSGjt7aKePxQy1Wc+4Qq+nk7bdu\\nPER5B/vV2UpAxo5MR72eEqQQ2M8CKPICvOGzXWqfjVowsQWJXLIMmw==\\n-----END PUBLIC KEY-----","reference":"insolar:1AfKI3TkFAsv4C2x_vkZrtRF17fsPSYG2CH7bQpeBx2I","seed":"nW/RudtU5f32/HwbSOROvUBwRzbk26Qb' --- \
+               55020200 0F 'S3eI4v7HE1M="}}'
 
 
 go run main.go 55020000 14 2c000080 c5010080 00000080 00000080 00000080 ---  \
                55020200 20 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-
-
-
- 00000047
- 3045022100928B633B9BF0E165CC2D662E98CDEC0382127CA51106A1AAF967B668F627680602202430FB7FA82D9955DC6DF26B7F06D12C1880D68B223F3F6A34256E9C8C339CC39000
-
-
  */
