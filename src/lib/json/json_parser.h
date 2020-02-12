@@ -62,16 +62,9 @@ typedef struct {
 /// \param transaction
 /// \param transaction_length
 /// \return Error message
-parser_error_t json_parse_s(parsed_json_t *parsed_json,
-                            const char *transaction,
-                            uint16_t transaction_length);
-
-/// Parse json to create a token representation
-/// \param parsed_json
-/// \param transaction
-/// \return Error message
 parser_error_t json_parse(parsed_json_t *parsed_json,
-                          const char *transaction);
+                          const char *transaction,
+                          uint16_t transaction_length);
 
 /// Get the number of elements in the array
 /// \param array_token_index
@@ -123,6 +116,10 @@ int16_t object_get_nth_value(uint16_t object_token_index,
 int16_t object_get_value(const parsed_json_t *parsed_transaction,
                          uint16_t object_token_index,
                          const char *key_name);
+
+/// Get token index by path in json, end of arglist must be designated by null
+int16_t object_get_index_by_path(const parsed_json_t *parsed_transaction, ...);
+
 
 #ifdef __cplusplus
 }

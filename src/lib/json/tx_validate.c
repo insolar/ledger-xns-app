@@ -113,20 +113,21 @@ parser_error_t tx_validate(parsed_json_t *json) {
 //    if (dictionaries_sorted(json) != 1) {
 //        return parser_json_is_not_sorted;
 //    }
+//     auto transaction = R"({"jsonrpc":"2.0","id":1,"method":"contract.call","params":{"callSite":"member.transfer","callParams":{"amount":"20000000000","toMemberReference":"insolar:1AAEAATjWvxVC3DFEBqINu7JSKWxlcb_uJo7QdAHrcP8"},"reference":"insolar:1AAEAAY2zkW3pOTCIlYg6XqhWLR32AAeBpTKZ3vLdFhE","publicKey":"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEc+Vs4y+XWE77LR0QL1e1wCOFePFEHJIB\ndsPWPKMH5zGRhRWV1HCJXajENCV2bdG/YKKEOAzTdE5BGXNg2dRQpQ==\n-----END PUBLIC KEY-----","seed":"rOpiqgDHHDmr2PfI5UzZiWpjRyDMoFtBNFoOwyC+yJ8="}})";
+//    object_get_value(json,0,"method") == -1
 
-    if (object_get_value(
-        json,
-        0,
-        "amount") == -1) {
-//        "params/callParams/amount") == -1) {
+    //    return parser_json_missing_method;
+
+
+    int16_t paramsIdx = object_get_value(json,0,"params");
+    if (paramsIdx == -1) {
         return parser_json_missing_memo;
     }
 
     if (object_get_value(
             json,
-            0,
-            "toMemberReference") == -1) {
-//            "params/callParams/toMemberReference") == -1) {
+            paramsIdx,
+            "callSite") == -1) {
         return parser_json_missing_memo;
     }
 

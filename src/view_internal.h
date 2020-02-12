@@ -88,13 +88,11 @@ void splitValueField();
 
 void view_idle_show_impl();
 
-void view_address_show_impl();
-
 void view_error_show_impl();
 
 void view_sign_show_impl();
 
-void h_address_accept(unsigned int _);
+// void h_address_accept(unsigned int _);
 
 void h_error_accept(unsigned int _);
 

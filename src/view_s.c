@@ -48,20 +48,20 @@ const ux_menu_entry_t menu_main[] = {
     UX_MENU_END
 };
 
-UX_STEP_NOCB_INIT(ux_addr_flow_1_step, paging,
-        { h_addr_update_item(CUR_FLOW.index); },
-        { .title = "Address", .text = viewdata.addr, });
-UX_STEP_NOCB_INIT(ux_addr_flow_2_step, paging,
-        { h_addr_update_item(CUR_FLOW.index); },
-        { .title = "Path", .text = viewdata.addr, });
-UX_STEP_VALID(ux_addr_flow_3_step, pb, h_address_accept(0), { &C_icon_validate_14, "Ok"});
+//UX_STEP_NOCB_INIT(ux_addr_flow_1_step, paging,
+//        { h_addr_update_item(CUR_FLOW.index); },
+//        { .title = "Address", .text = viewdata.addr, });
+//UX_STEP_NOCB_INIT(ux_addr_flow_2_step, paging,
+//        { h_addr_update_item(CUR_FLOW.index); },
+//        { .title = "Path", .text = viewdata.addr, });
+// UX_STEP_VALID(ux_addr_flow_3_step, pb, h_address_accept(0), { &C_icon_validate_14, "Ok"});
 
-UX_FLOW(
-    ux_addr_flow,
-    &ux_addr_flow_1_step,
-    &ux_addr_flow_2_step,
-    &ux_addr_flow_3_step
-);
+//UX_FLOW(
+//    ux_addr_flow,
+//    &ux_addr_flow_1_step,
+//    &ux_addr_flow_2_step,
+//    &ux_addr_flow_3_step
+//);
 
 void h_review(unsigned int _) { UNUSED(_); view_sign_show_impl(); }
 
@@ -193,14 +193,6 @@ void view_idle_show_impl() {
     UX_MENU_DISPLAY(0, menu_main, NULL);
 }
 
-void view_address_show_impl() {
-    ux_layout_paging_reset();
-    if(G_ux.stack_count == 0) {
-        ux_stack_push();
-    }
-    ux_flow_init(0, ux_addr_flow, NULL);
-}
-
 void view_error_show_impl() {
     UX_DISPLAY(view_error, view_prepro);
 }
@@ -235,11 +227,6 @@ void view_review_show() {
 static const bagl_element_t view_debug[] = {
     UI_LabelLine(UIID_LABEL + 0, 0, 8, UI_SCREEN_WIDTH, UI_11PX, UI_WHITE, UI_BLACK, "debug"),
 };
-
-void view_debug_show(char * str) {
-        strcpy(debug, str);
-   //     UX_DISPLAY(view_debug, NULL);
-}
 
 
 #endif

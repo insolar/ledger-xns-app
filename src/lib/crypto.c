@@ -90,7 +90,7 @@ uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t
                 signatureLength = cx_ecdsa_sign(&cx_privateKey,
                                                 CX_RND_RFC6979 | CX_LAST,
                                                 CX_SHA256,
-                                                message, // message_digest,
+                                                message_digest,
                                                 CX_SHA256_SIZE,
                                                 signature,
                                                 signatureMaxlen,
@@ -155,9 +155,9 @@ void crypto_set_hrp(char *p) {
     }
 }
 
-uint16_t crypto_fillAddress(uint8_t *buffer, uint16_t buffer_len) {
-    if (buffer_len < PK_LEN + 50) {
-        return 0;
-    }
-    return crypto_extractPublicKey(bip44Path, buffer);
-}
+//uint16_t crypto_fillAddress(uint8_t *buffer, uint16_t buffer_len) {
+//    if (buffer_len < PK_LEN + 50) {
+//        return 0;
+//    }
+//    return crypto_extractPublicKey(bip44Path, buffer);
+//}

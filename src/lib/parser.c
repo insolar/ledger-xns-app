@@ -20,8 +20,8 @@
 #include <zxtypes.h>
 #include "json/tx_parser.h"
 #include "json/tx_display.h"
-#include "parser_impl.h"
-#include "../view_internal.h"
+#include "lib/parser_impl.h"
+#include "view_internal.h"
 #include "jsmn.h"
 #include "parser.h"
 
@@ -79,31 +79,17 @@ __Z_INLINE bool_t parser_areEqual(uint16_t tokenidx, char *expected) {
     return true;
 }
 
-/*
- * {
- *  "jsonrpc":"2.0",
- *  "id":1,
- *  "method":"contract.call",
- *  "params":{
- *      "callSite":"member.transfer",
- *      "callParams":{
- *          "amount":"550000000000",
- *          "toMemberReference":"insolar:1AdHjF5J9CmGazFKqcsjw_Tjxfo9bInnewr0ZQ9VNaFA"
- *          },
- *      "publicKey":"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAECSum1PSGjt7aKePxQy1Wc+4Qq+nk7bdu\nPER5B/vV2UpAxo5MR72eEqQQ2M8CKPICvOGzXWqfjVowsQWJXLIMmw==\n-----END PUBLIC KEY-----",
- *      "reference":"insolar:1AfKI3TkFAsv4C2x_vkZrtRF17fsPSYG2CH7bQpeBx2I",
- *      "seed":"nW/RudtU5f32/HwbSOROvUBwRzbk26QbS3eI4v7HE1M="
- *  }
- * }
- */
-
-
-
 __Z_INLINE bool_t parser_isAmount(char *key) {
-    if (strcmp(parser_tx_obj.query.out_key, "params/callParams/amount") == 0)
+    if (strcmp(parser_tx_obj.query.out_key, "fee/amount") == 0)
         return true;
 
-    if (strcmp(parser_tx_obj.query.out_key, "params/callParams/toMemberReference") == 0)
+    if (strcmp(parser_tx_obj.query.out_key, "msgs/inputs/coins") == 0)
+        return true;
+
+    if (strcmp(parser_tx_obj.query.out_key, "msgs/outputs/coins") == 0)
+        return true;
+
+    if (strcmp(parser_tx_obj.query.out_key, "msgs/value/amount") == 0)
         return true;
 
     return false;

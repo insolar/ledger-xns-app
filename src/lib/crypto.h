@@ -34,7 +34,7 @@ uint8_t extractHRP(uint32_t rx, uint32_t offset);
 
 void crypto_set_hrp(char *p);
 
-uint16_t crypto_fillAddress(uint8_t *buffer, uint16_t buffer_len);
+//uint16_t crypto_fillAddress(uint8_t *buffer, uint16_t buffer_len);
 
 uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t *message, uint16_t messageLen);
 uint16_t crypto_sign_hashed(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t *message, uint16_t messageLen);

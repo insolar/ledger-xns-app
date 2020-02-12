@@ -178,30 +178,32 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                     break;
                 }
 
-                case INS_GET_ADDR_SECP256R1: {
-                    extractBip44(rx, OFFSET_DATA );
-                    if (G_io_apdu_buffer[OFFSET_P1]) {
-                        app_fill_address();
-                        view_address_show();
-                        *flags |= IO_ASYNCH_REPLY;
-                        break;
+                // todo remove
+//                case INS_GET_ADDR_SECP256R1: {
+//                    extractBip44(rx, OFFSET_DATA );
+//                    if (G_io_apdu_buffer[OFFSET_P1]) {
+//                        app_fill_address();
+//                        view_address_show();
+//                        *flags |= IO_ASYNCH_REPLY;
+//                        break;
+//                    }
+//
+//                    *tx = app_fill_address();
+//                    THROW(APDU_CODE_OK);
+//                    break;
+//                }
+                case INS_SIGN_SECP256R1: {
+                    if (!process_chunk(tx, rx)) {
+                        THROW(APDU_CODE_OK);
                     }
 
-                    *tx = app_fill_address();
-                    THROW(APDU_CODE_OK);
-                    break;
-                }
-                case INS_SIGN_SECP256R1: {
-                    if (!process_chunk(tx, rx))
-                        THROW(APDU_CODE_OK);
-                    //  const char *error_msg = tx_parse();
-//
-//                    if (error_msg != NULL) {
-//                        int error_msg_length = strlen(error_msg);
-//                        MEMCPY(G_io_apdu_buffer, error_msg, error_msg_length);
-//                        *tx += (error_msg_length);
-//                        THROW(APDU_CODE_DATA_INVALID);
-//                    }
+                    const char *error_msg = tx_parse();
+                    if (error_msg != NULL) {
+                        int error_msg_length = strlen(error_msg);
+                        MEMCPY(G_io_apdu_buffer, error_msg, error_msg_length);
+                        *tx += (error_msg_length);
+                        THROW(APDU_CODE_DATA_INVALID);
+                    }
 
                     view_sign_show();
                     *flags |= IO_ASYNCH_REPLY;
@@ -330,15 +332,3 @@ void app_main() {
 }
 
 #pragma clang diagnostic pop
-
-
-/*
-go run main.go 55020000 14 2c000080 c5010080 00000080 00000080 00000080 ---  \
-               55020100 FA '{"jsonrpc":"2.0","id":1,"method":"contract.call","params":{"callSite":"member.transfer","callParams":{"amount":"550000000000","toMemberReference":"insolar:1AdHjF5J9CmGazFKqcsjw_Tjxfo9bInnewr0ZQ9VNaFA"},"publicKey":"-----BEGIN PUBLIC KEY-----\\nMFYwEAY' --- \
-               55020100 FA 'HKoZIzj0CAQYFK4EEAAoDQgAECSum1PSGjt7aKePxQy1Wc+4Qq+nk7bdu\\nPER5B/vV2UpAxo5MR72eEqQQ2M8CKPICvOGzXWqfjVowsQWJXLIMmw==\\n-----END PUBLIC KEY-----","reference":"insolar:1AfKI3TkFAsv4C2x_vkZrtRF17fsPSYG2CH7bQpeBx2I","seed":"nW/RudtU5f32/HwbSOROvUBwRzbk26Qb' --- \
-               55020200 0F 'S3eI4v7HE1M="}}'
-
-
-go run main.go 55020000 14 2c000080 c5010080 00000080 00000080 00000080 ---  \
-               55020200 20 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
- */

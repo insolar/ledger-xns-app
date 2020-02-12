@@ -18,24 +18,15 @@
 #include <zxmacros.h>
 #include <parser_common.h>
 #include "json_parser.h"
+#include "stdarg.h"
 
-#if defined(TARGET_NANOS) || defined(TARGET_NANOX)
-#include "os.h"
-#define EQUALS(_P, _Q, _LEN) (os_memcmp( PIC(_P), PIC(_Q), (_LEN))==0)
-#else
-#define EQUALS(_P, _Q, _LEN) (memcmp( (_P), (_Q), (_LEN))==0)
-#endif
+#define EQUALS(_P, _Q, _LEN) (MEMCMP( (_P), (_Q), (_LEN))==0)
 
-parser_error_t json_parse(parsed_json_t *parsed_json, const char *buffer) {
-    return json_parse_s(parsed_json, buffer, strlen(buffer));
-}
-
-parser_error_t json_parse_s(parsed_json_t *parsed_json,
-                         const char *buffer, uint16_t bufferLen) {
+parser_error_t json_parse(parsed_json_t *parsed_json, const char *buffer, uint16_t bufferLen) {
     jsmn_parser parser;
     jsmn_init(&parser);
 
-    explicit_bzero(parsed_json, sizeof(parsed_json_t));
+    MEMZERO(parsed_json, sizeof(parsed_json_t));
     parsed_json->buffer = buffer;
     parsed_json->bufferLen = bufferLen;
 
@@ -217,7 +208,8 @@ int16_t object_get_nth_value(uint16_t object_token_index,
 int16_t object_get_value(const parsed_json_t *parsed_transaction,
                          uint16_t object_token_index,
                          const char *key_name) {
-    if (object_token_index < 0 || object_token_index > parsed_transaction->numberOfTokens) {return -1;
+    if (object_token_index < 0 || object_token_index > parsed_transaction->numberOfTokens) {
+        return -1;
     }
 
     const jsmntok_t object_token = parsed_transaction->tokens[object_token_index];
@@ -238,6 +230,12 @@ int16_t object_get_value(const parsed_json_t *parsed_transaction,
             continue;
         }
         prev_element_end = value_token.end;
+// todo remove
+//        if (value_token.type != JSMN_OBJECT && value_token.type != JSMN_ARRAY) {
+//            prev_element_end = value_token.end;
+//        } else {
+//            prev_element_end = value_token.start;
+//        }
 
         if (((uint16_t) strlen(key_name)) == (key_token.end - key_token.start)) {
             if (EQUALS(key_name,
@@ -250,3 +248,26 @@ int16_t object_get_value(const parsed_json_t *parsed_transaction,
 
     return -1;
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int16_t object_get_index_by_path(const parsed_json_t *parsed_transaction, ...) {
+    va_list argp;
+    va_start(argp, parsed_transaction);
+
+    int16_t idx = 0;
+    char *key = 0;
+    while (key = va_arg(argp, char*)) {
+        idx = object_get_value(parsed_transaction, idx, key);
+        if (idx == -1) return -1;
+    }
+
+    va_end(argp);
+    return idx;
+}
+
+#ifdef __cplusplus
+}
+#endif

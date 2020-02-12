@@ -32,18 +32,18 @@
 
 view_t viewdata;
 
-void h_address_accept(unsigned int _) {
-    UNUSED(_);
-    view_idle_show(0);
-    UX_WAIT();
-    app_reply_address();
-}
+//void h_address_accept(unsigned int _) {
+//    UNUSED(_);
+//    view_idle_show(0);
+//    UX_WAIT();
+//    app_reply_address();
+//}
 
 void h_error_accept(unsigned int _) {
     UNUSED(_);
     view_idle_show(0);
     UX_WAIT();
-    app_reply_address();
+    // app_reply_address();
 }
 
 void h_sign_accept(unsigned int _) {
@@ -138,10 +138,6 @@ void view_init(void) {
 
 void view_idle_show(unsigned int ignored) {
     view_idle_show_impl();
-}
-
-void view_address_show() {
-    view_address_show_impl();
 }
 
 void view_error_show() {

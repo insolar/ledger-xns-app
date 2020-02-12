@@ -35,7 +35,7 @@
 #define INS_GET_VERSION                 0
 #define INS_GET_PLUSONE                 1
 #define INS_SIGN_SECP256R1              2
-#define INS_GET_ADDR_SECP256R1          4
+//#define INS_GET_ADDR_SECP256R1          4
 #define INS_SIGN_HASH                   5
 
 
