@@ -33,11 +33,11 @@ void app_set_hrp(char *p) {
     crypto_set_hrp(p);
 }
 
-//uint8_t app_fill_address() {
-//    // Put data directly in the apdu buffer
-//    MEMZERO(G_io_apdu_buffer, IO_APDU_BUFFER_SIZE);
-//    return crypto_fillAddress(G_io_apdu_buffer, IO_APDU_BUFFER_SIZE - 2);
-//}
+uint8_t app_fill_address() {
+    // Put data directly in the apdu buffer
+    MEMZERO(G_io_apdu_buffer, IO_APDU_BUFFER_SIZE);
+    return crypto_fillAddress(G_io_apdu_buffer, IO_APDU_BUFFER_SIZE - 2);
+}
 
 //void app_reply_address() {
 //    const uint8_t replyLen = app_fill_address();

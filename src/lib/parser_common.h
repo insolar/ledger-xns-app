@@ -54,6 +54,11 @@ typedef enum {
 
     // XNS transaction
     parser_json_missing_method,
+    parser_json_unsupported_method,
+    parser_json_unexpected_params,
+    parser_json_missing_callsite,
+    parser_json_missing_seed,
+    parser_json_missing_public_key
 } parser_error_t;
 
 typedef struct {
@@ -61,6 +66,14 @@ typedef struct {
     uint16_t bufferLen;
     uint16_t offset;
 } parser_context_t;
+
+static const char* token_key_method = "method";
+static const char* token_key_params = "params";
+static const char* token_key_callsite = "callSite";
+static const char* token_key_callparams ="callParams";
+static const char* token_key_seed ="seed";
+static const char* token_key_public_key ="publicKey";
+
 
 #ifdef __cplusplus
 }

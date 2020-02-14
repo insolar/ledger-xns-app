@@ -178,20 +178,19 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                     break;
                 }
 
-                // todo remove
-//                case INS_GET_ADDR_SECP256R1: {
-//                    extractBip44(rx, OFFSET_DATA );
-//                    if (G_io_apdu_buffer[OFFSET_P1]) {
-//                        app_fill_address();
-//                        view_address_show();
-//                        *flags |= IO_ASYNCH_REPLY;
-//                        break;
-//                    }
-//
-//                    *tx = app_fill_address();
-//                    THROW(APDU_CODE_OK);
-//                    break;
-//                }
+                case INS_GET_ADDR_SECP256R1: {
+                    extractBip44(rx, OFFSET_DATA );
+                    if (G_io_apdu_buffer[OFFSET_P1]) {
+                        app_fill_address();
+                        //view_address_show();
+                        *flags |= IO_ASYNCH_REPLY;
+                        break;
+                    }
+
+                    *tx = app_fill_address();
+                    THROW(APDU_CODE_OK);
+                    break;
+                }
                 case INS_SIGN_SECP256R1: {
                     if (!process_chunk(tx, rx)) {
                         THROW(APDU_CODE_OK);

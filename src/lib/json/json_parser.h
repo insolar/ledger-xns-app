@@ -117,10 +117,6 @@ int16_t object_get_value(const parsed_json_t *parsed_transaction,
                          uint16_t object_token_index,
                          const char *key_name);
 
-/// Get token index by path in json, end of arglist must be designated by null
-int16_t object_get_index_by_path(const parsed_json_t *parsed_transaction, ...);
-
-
 #ifdef __cplusplus
 }
 #endif

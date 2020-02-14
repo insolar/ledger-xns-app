@@ -97,6 +97,19 @@ const char *parser_getErrorDescription(parser_error_t err) {
             return "JSON Missing account number";
         case parser_json_missing_memo:
             return "JSON Missing memo";
+        // XNS
+        case parser_json_missing_method:
+            return "JSON Missing method";
+        case parser_json_unsupported_method:
+            return "JSON Unsupported method";
+        case parser_json_unexpected_params:
+            return "JSON Unexpected params";
+        case parser_json_missing_seed:
+            return "JSON Missing Seed";
+        case parser_json_missing_callsite:
+            return "JSON Missing callSite";
+        case parser_json_missing_public_key:
+            return "JSON Missing Public Key";
 
         default:
             return "Unrecognized error code";

@@ -67,7 +67,7 @@ void h_review(unsigned int _) { UNUSED(_); view_sign_show_impl(); }
 
 const ux_menu_entry_t menu_sign[] = {
     // {NULL, h_review, 0, NULL, "View Key", NULL, 0, 0},
-    {NULL, h_sign_accept, 0, NULL, "Sign transaction", NULL, 0, 0},
+    {NULL, h_sign_accept, 0, NULL, "Sign command", NULL, 0, 0},
     {NULL, h_sign_reject, 0, &C_icon_back, "Reject", NULL, 60, 40},
     UX_MENU_END
 };

@@ -18,9 +18,8 @@
 #include <zxmacros.h>
 #include <parser_common.h>
 #include "json_parser.h"
-#include "stdarg.h"
 
-#define EQUALS(_P, _Q, _LEN) (MEMCMP( (_P), (_Q), (_LEN))==0)
+#define EQUALS(_P, _Q, _LEN) (MEMCMP( PIC(_P), PIC(_Q), (_LEN))==0)
 
 parser_error_t json_parse(parsed_json_t *parsed_json, const char *buffer, uint16_t bufferLen) {
     jsmn_parser parser;
@@ -230,12 +229,6 @@ int16_t object_get_value(const parsed_json_t *parsed_transaction,
             continue;
         }
         prev_element_end = value_token.end;
-// todo remove
-//        if (value_token.type != JSMN_OBJECT && value_token.type != JSMN_ARRAY) {
-//            prev_element_end = value_token.end;
-//        } else {
-//            prev_element_end = value_token.start;
-//        }
 
         if (((uint16_t) strlen(key_name)) == (key_token.end - key_token.start)) {
             if (EQUALS(key_name,
@@ -248,26 +241,3 @@ int16_t object_get_value(const parsed_json_t *parsed_transaction,
 
     return -1;
 }
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int16_t object_get_index_by_path(const parsed_json_t *parsed_transaction, ...) {
-    va_list argp;
-    va_start(argp, parsed_transaction);
-
-    int16_t idx = 0;
-    char *key = 0;
-    while (key = va_arg(argp, char*)) {
-        idx = object_get_value(parsed_transaction, idx, key);
-        if (idx == -1) return -1;
-    }
-
-    va_end(argp);
-    return idx;
-}
-
-#ifdef __cplusplus
-}
-#endif

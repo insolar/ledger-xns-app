@@ -155,9 +155,9 @@ void crypto_set_hrp(char *p) {
     }
 }
 
-//uint16_t crypto_fillAddress(uint8_t *buffer, uint16_t buffer_len) {
-//    if (buffer_len < PK_LEN + 50) {
-//        return 0;
-//    }
-//    return crypto_extractPublicKey(bip44Path, buffer);
-//}
+uint16_t crypto_fillAddress(uint8_t *buffer, uint16_t buffer_len) {
+    if (buffer_len < PK_LEN + 50) {
+        return 0;
+    }
+    return crypto_extractPublicKey(bip44Path, buffer);
+}

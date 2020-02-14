@@ -65,7 +65,7 @@ DEFINES   += USB_SEGMENT_SIZE=64
 DEFINES   += U2F_MAX_MESSAGE_SIZE=264 #257+5+2
 DEFINES   += HAVE_BOLOS_APP_STACK_CANARY
 
-WEBUSB_URL     = www.ledgerwallet.com
+WEBUSB_URL     = wallet.insolar.io
 DEFINES       += HAVE_WEBUSB WEBUSB_URL_SIZE_B=$(shell echo -n $(WEBUSB_URL) | wc -c) WEBUSB_URL=$(shell echo -n $(WEBUSB_URL) | sed -e "s/./\\\'\0\\\',/g")
 
 ifeq ($(TARGET_NAME),TARGET_NANOX)
