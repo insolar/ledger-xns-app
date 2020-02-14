@@ -32,18 +32,11 @@
 
 view_t viewdata;
 
-//void h_address_accept(unsigned int _) {
-//    UNUSED(_);
-//    view_idle_show(0);
-//    UX_WAIT();
-//    app_reply_address();
-//}
 
 void h_error_accept(unsigned int _) {
     UNUSED(_);
     view_idle_show(0);
     UX_WAIT();
-    // app_reply_address();
 }
 
 void h_sign_accept(unsigned int _) {

@@ -48,20 +48,6 @@ const ux_menu_entry_t menu_main[] = {
     UX_MENU_END
 };
 
-//UX_STEP_NOCB_INIT(ux_addr_flow_1_step, paging,
-//        { h_addr_update_item(CUR_FLOW.index); },
-//        { .title = "Address", .text = viewdata.addr, });
-//UX_STEP_NOCB_INIT(ux_addr_flow_2_step, paging,
-//        { h_addr_update_item(CUR_FLOW.index); },
-//        { .title = "Path", .text = viewdata.addr, });
-// UX_STEP_VALID(ux_addr_flow_3_step, pb, h_address_accept(0), { &C_icon_validate_14, "Ok"});
-
-//UX_FLOW(
-//    ux_addr_flow,
-//    &ux_addr_flow_1_step,
-//    &ux_addr_flow_2_step,
-//    &ux_addr_flow_3_step
-//);
 
 void h_review(unsigned int _) { UNUSED(_); view_sign_show_impl(); }
 

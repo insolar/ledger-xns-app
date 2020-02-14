@@ -183,15 +183,6 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                    // uint8_t len = extractHRP(rx, OFFSET_DATA);
                     extractBip44(rx, OFFSET_DATA);
 
-//                    uint8_t requireConfirmation = G_io_apdu_buffer[OFFSET_P1];
-//
-//                    if (requireConfirmation) {
-//                        app_fill_address();
-//                        view_address_show();
-//                        *flags |= IO_ASYNCH_REPLY;
-//                        break;
-//                    }
-
                     *tx = app_fill_address();
                     THROW(APDU_CODE_OK);
                     break;

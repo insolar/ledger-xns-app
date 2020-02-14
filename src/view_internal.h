@@ -65,10 +65,10 @@ typedef enum {
     view_error_detected = 2
 } view_error_t;
 
-//#define print_title(...) snprintf(viewdata.title, sizeof(viewdata.title), __VA_ARGS__)
-//#define print_key(...) snprintf(viewdata.key, sizeof(viewdata.key), __VA_ARGS__);
-//#define print_value(...) snprintf(viewdata.value, sizeof(viewdata.value), __VA_ARGS__);
-//
+#define print_title(...) snprintf(viewdata.title, sizeof(viewdata.title), __VA_ARGS__)
+#define print_key(...) snprintf(viewdata.key, sizeof(viewdata.key), __VA_ARGS__);
+#define print_value(...) snprintf(viewdata.value, sizeof(viewdata.value), __VA_ARGS__);
+
 #if defined(TARGET_NANOS)
 #define print_value2(...) snprintf(viewdata.value2, sizeof(viewdata.value2), __VA_ARGS__);
 #endif
@@ -89,8 +89,6 @@ void view_idle_show_impl();
 void view_error_show_impl();
 
 void view_sign_show_impl();
-
-// void h_address_accept(unsigned int _);
 
 void h_error_accept(unsigned int _);
 
