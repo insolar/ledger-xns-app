@@ -90,20 +90,21 @@ unsigned short io_exchange_al(unsigned char channel, unsigned short tx_len) {
     return 0;
 }
 
-int extractBip44(uint32_t rx, uint32_t offset) {
+void extractBip44(uint32_t rx, uint32_t offset) {
     if ((rx - offset) < sizeof(uint32_t) * BIP44_LEN_DEFAULT) {
         THROW(APDU_CODE_WRONG_LENGTH);
     }
 
     MEMCPY(bip44Path, G_io_apdu_buffer + offset, sizeof(uint32_t) * BIP44_LEN_DEFAULT);
 
+    // Check values
     if (bip44Path[0] != BIP44_0_DEFAULT
         || bip44Path[1] != BIP44_1_DEFAULT
-        || !(bip44Path[2] & 0x80000000)
+        || ((bip44Path[2] & BIP44_2_DEFAULT) == 0)
         ) {
-        THROW(APDU_CODE_DATA_INVALID);
+        THROW(bip44Path[0]);
+//        THROW(APDU_CODE_DATA_INVALID);
     }
-    return offset + sizeof(uint32_t) * BIP44_LEN_DEFAULT;
 }
 
 bool process_chunk(volatile uint32_t *tx, uint32_t rx) {
@@ -178,25 +179,30 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                     break;
                 }
 
-                case INS_GET_ADDR_SECP256R1: {
-                    extractBip44(rx, OFFSET_DATA );
-                    if (G_io_apdu_buffer[OFFSET_P1]) {
-                        app_fill_address();
-                        //view_address_show();
-                        *flags |= IO_ASYNCH_REPLY;
-                        break;
-                    }
+                case INS_GET_ADDR_SECP256K1: {
+                   // uint8_t len = extractHRP(rx, OFFSET_DATA);
+                    extractBip44(rx, OFFSET_DATA);
+
+//                    uint8_t requireConfirmation = G_io_apdu_buffer[OFFSET_P1];
+//
+//                    if (requireConfirmation) {
+//                        app_fill_address();
+//                        view_address_show();
+//                        *flags |= IO_ASYNCH_REPLY;
+//                        break;
+//                    }
 
                     *tx = app_fill_address();
                     THROW(APDU_CODE_OK);
                     break;
                 }
-                case INS_SIGN_SECP256R1: {
-                    if (!process_chunk(tx, rx)) {
+
+                case INS_SIGN_SECP256K1: {
+                    if (!process_chunk(tx, rx))
                         THROW(APDU_CODE_OK);
-                    }
 
                     const char *error_msg = tx_parse();
+
                     if (error_msg != NULL) {
                         int error_msg_length = strlen(error_msg);
                         MEMCPY(G_io_apdu_buffer, error_msg, error_msg_length);
@@ -206,18 +212,6 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
 
                     view_sign_show();
                     *flags |= IO_ASYNCH_REPLY;
-                    break;
-                }
-
-                case INS_SIGN_HASH: { // sign already hashed
-                    int offset = extractBip44(rx, OFFSET_DATA);
-
-                    uint8_t *hash = G_io_apdu_buffer + offset;
-                    hash[32]=0;
-                    int sl = crypto_sign(G_io_apdu_buffer,64, hash , 31);
-                    *tx = 64;
-                    snprintf((char*)G_io_apdu_buffer, 10, "[%d]", sl);
-                    THROW(APDU_CODE_OK);
                     break;
                 }
 

@@ -36,7 +36,7 @@ char bech32_hrp[MAX_BECH32_HRP_LEN + 1];
 #if defined(TARGET_NANOS) || defined(TARGET_NANOX)
 #include "cx.h"
 
-unsigned int crypto_extractPublicKey(uint32_t bip44Path[BIP44_LEN_DEFAULT], uint8_t *pubKey){
+uint16_t crypto_extractPublicKey(uint32_t bip44Path[BIP44_LEN_DEFAULT], uint8_t *pubKey) {
     cx_ecfp_public_key_t cx_publicKey;
     cx_ecfp_private_key_t cx_privateKey;
     uint8_t privateKeyData[32];
@@ -65,7 +65,7 @@ unsigned int crypto_extractPublicKey(uint32_t bip44Path[BIP44_LEN_DEFAULT], uint
 }
 
 uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t *message, uint16_t messageLen) {
-    uint8_t message_digest[CX_SHA256_SIZE+1];
+    uint8_t message_digest[CX_SHA256_SIZE];
     SAFE_HEARTBEAT(cx_hash_sha256(message, messageLen, message_digest, CX_SHA256_SIZE));
 
     cx_ecfp_private_key_t cx_privateKey;
@@ -109,9 +109,10 @@ uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t
 
 #else
 
-void crypto_extractPublicKey(uint32_t path[BIP32_LEN_DEFAULT], uint8_t *pubKey) {
+uint16_t crypto_extractPublicKey(uint32_t path[BIP32_LEN_DEFAULT], uint8_t *pubKey) {
     // Empty version for non-Ledger devices
     MEMZERO(pubKey, 32);
+    return 32;
 }
 
 uint16_t crypto_sign(uint8_t *signature,
@@ -159,5 +160,7 @@ uint16_t crypto_fillAddress(uint8_t *buffer, uint16_t buffer_len) {
     if (buffer_len < PK_LEN + 50) {
         return 0;
     }
+
+    // extract pubkey
     return crypto_extractPublicKey(bip44Path, buffer);
 }

@@ -59,8 +59,6 @@ typedef struct {
 
 extern view_t viewdata;
 
-extern char *debug;
-
 typedef enum {
     view_no_error = 0,
     view_no_data = 1,
