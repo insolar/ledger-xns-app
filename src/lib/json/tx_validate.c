@@ -15,8 +15,11 @@
 ********************************************************************************/
 
 #include <jsmn.h>
+#include <zxmacros.h>
 #include <parser_common.h>
 #include "json/json_parser.h"
+
+#define EQUALS(_P, _Q, _LEN) (MEMCMP( (_P), (_Q), (_LEN))==0)
 
 const char whitespaces[] = {
         0x20,// space ' '
@@ -110,50 +113,51 @@ parser_error_t tx_validate(parsed_json_t *json) {
         return parser_json_contains_whitespace;
     }
 
-    if (dictionaries_sorted(json) != 1) {
-        return parser_json_is_not_sorted;
+//    if (dictionaries_sorted(json) != 1) {
+//        return parser_json_is_not_sorted;
+//    }
+
+
+//     auto transaction = R"({"jsonrpc":"2.0","id":1,
+//     "method":"contract.call","params":
+//     {"callSite":"member.transfer","callParams":{"amount":"20000000000","toMemberReference":"insolar:1AAEAATjWvxVC3DFEBqINu7JSKWxlcb_uJo7QdAHrcP8"},
+//     "reference":"insolar:1AAEAAY2zkW3pOTCIlYg6XqhWLR32AAeBpTKZ3vLdFhE","publicKey":"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEc+Vs4y+XWE77LR0QL1e1wCOFePFEHJIB\ndsPWPKMH5zGRhRWV1HCJXajENCV2bdG/YKKEOAzTdE5BGXNg2dRQpQ==\n-----END PUBLIC KEY-----",
+//     "seed":"rOpiqgDHHDmr2PfI5UzZiWpjRyDMoFtBNFoOwyC+yJ8="}})";
+
+    // find method
+    const int16_t method_token_idx = object_get_value(json, ROOT_TOKEN_INDEX, token_key_method);
+    if (method_token_idx == -1) {
+        return parser_json_missing_method;
     }
 
-    if (object_get_value(
-        json,
-        0,
-        "chain_id") == -1) {
-        return parser_json_missing_chain_id;
+    // method should be contract.call
+    if (!EQUALS("contract.call",
+               json->buffer + json->tokens[method_token_idx].start,
+               json->tokens[method_token_idx].end - json->tokens[method_token_idx].start)) {
+        return parser_json_unsupported_method;
     }
 
-    if (object_get_value(
-        json,
-        0,
-        "sequence") == -1) {
-        return parser_json_missing_sequence;
+    // find params
+    const int16_t  params_token_idx = object_get_value(json, ROOT_TOKEN_INDEX, token_key_params);
+    // params should be object
+    if (json->tokens[method_token_idx].type == JSMN_OBJECT) {
+        return parser_json_unexpected_params;
     }
 
-    if (object_get_value(
-        json,
-        0,
-        "fee") == -1) {
-        return parser_json_missing_fee;
+    // params object should contain keys: [seed, publicKey, callSite] and optional key callParams
+    int16_t idx = object_get_value(json, params_token_idx,token_key_callsite);
+    if (idx == -1) {
+        return parser_json_missing_callsite;
     }
 
-    if (object_get_value(
-        json,
-        0,
-        "msgs") == -1) {
-        return parser_json_missing_msgs;
+    idx = object_get_value(json, params_token_idx, token_key_seed);
+    if (idx == -1) {
+        return parser_json_missing_seed;
     }
 
-    if (object_get_value(
-        json,
-        0,
-        "account_number") == -1) {
-        return parser_json_missing_account_number;
-    }
-
-    if (object_get_value(
-        json,
-        0,
-        "memo") == -1) {
-        return parser_json_missing_memo;
+    idx = object_get_value(json, params_token_idx, token_key_public_key);
+    if (idx == -1) {
+        return parser_json_missing_public_key;
     }
 
     return parser_ok;

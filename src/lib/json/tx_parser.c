@@ -21,6 +21,10 @@
 #include "zxmacros.h"
 #include "parser_impl.h"
 
+#ifndef __always_inline
+#define __always_inline inline
+#endif
+
 // strcat but source does not need to be terminated (a chunk from a bigger string is concatenated)
 // dst_max is measured in bytes including the space for NULL termination
 // src_size does not include NULL termination

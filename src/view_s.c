@@ -42,32 +42,18 @@ void os_exit(uint32_t id) {
 }
 
 const ux_menu_entry_t menu_main[] = {
-    {NULL, NULL, 0, &C_icon_app, MENU_MAIN_APP_LINE1, MENU_MAIN_APP_LINE2, 33, 12},
-    {NULL, NULL, 0, NULL, "v"APPVERSION, NULL, 0, 0},
+    {NULL, NULL, 0, &C_icon_app, MENU_MAIN_APP_LINE1, MENU_MAIN_APP_LINE2, 33, 0},
+    {NULL, NULL, 0, NULL, "Insolar XNS", "v"APPVERSION, 0, 0},
     {NULL, os_exit, 0, &C_icon_dashboard, "Quit", NULL, 50, 29},
     UX_MENU_END
 };
 
-UX_STEP_NOCB_INIT(ux_addr_flow_1_step, paging,
-        { h_addr_update_item(CUR_FLOW.index); },
-        { .title = "Address", .text = viewdata.addr, });
-UX_STEP_NOCB_INIT(ux_addr_flow_2_step, paging,
-        { h_addr_update_item(CUR_FLOW.index); },
-        { .title = "Path", .text = viewdata.addr, });
-UX_STEP_VALID(ux_addr_flow_3_step, pb, h_address_accept(0), { &C_icon_validate_14, "Ok"});
-
-UX_FLOW(
-    ux_addr_flow,
-    &ux_addr_flow_1_step,
-    &ux_addr_flow_2_step,
-    &ux_addr_flow_3_step
-);
 
 void h_review(unsigned int _) { UNUSED(_); view_sign_show_impl(); }
 
 const ux_menu_entry_t menu_sign[] = {
-    {NULL, h_review, 0, NULL, "View transaction", NULL, 0, 0},
-    {NULL, h_sign_accept, 0, NULL, "Sign transaction", NULL, 0, 0},
+    // {NULL, h_review, 0, NULL, "View Key", NULL, 0, 0},
+    {NULL, h_sign_accept, 0, NULL, "Sign command", NULL, 0, 0},
     {NULL, h_sign_reject, 0, &C_icon_back, "Reject", NULL, 60, 40},
     UX_MENU_END
 };
@@ -191,14 +177,6 @@ void splitValueField() {
 
 void view_idle_show_impl() {
     UX_MENU_DISPLAY(0, menu_main, NULL);
-}
-
-void view_address_show_impl() {
-    ux_layout_paging_reset();
-    if(G_ux.stack_count == 0) {
-        ux_stack_push();
-    }
-    ux_flow_init(0, ux_addr_flow, NULL);
 }
 
 void view_error_show_impl() {

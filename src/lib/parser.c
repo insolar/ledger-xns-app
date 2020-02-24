@@ -80,16 +80,7 @@ __Z_INLINE bool_t parser_areEqual(uint16_t tokenidx, char *expected) {
 }
 
 __Z_INLINE bool_t parser_isAmount(char *key) {
-    if (strcmp(parser_tx_obj.query.out_key, "fee/amount") == 0)
-        return true;
-
-    if (strcmp(parser_tx_obj.query.out_key, "msgs/inputs/coins") == 0)
-        return true;
-
-    if (strcmp(parser_tx_obj.query.out_key, "msgs/outputs/coins") == 0)
-        return true;
-
-    if (strcmp(parser_tx_obj.query.out_key, "msgs/value/amount") == 0)
+    if (strcmp(parser_tx_obj.query.out_key, "callParams/amount") == 0)
         return true;
 
     return false;
@@ -98,55 +89,23 @@ __Z_INLINE bool_t parser_isAmount(char *key) {
 __Z_INLINE parser_error_t parser_formatAmount(uint16_t amountToken,
                                               char *outVal, uint16_t outValLen,
                                               uint8_t pageIdx, uint8_t *pageCount) {
-    uint16_t numElements = array_get_element_count(amountToken, &parser_tx_obj.json);
-    if (parser_tx_obj.json.tokens[amountToken].type == JSMN_ARRAY) {
-        amountToken++;
-    }
 
-    numElements = array_get_element_count(amountToken, &parser_tx_obj.json);
-    if (numElements == 0) {
-        snprintf(outVal, outValLen, "Empty");
-        return parser_ok;
-    }
-
-    if (numElements != 4)
-        return parser_unexpected_field;
-
-    if (parser_tx_obj.json.tokens[amountToken].type != JSMN_OBJECT)
-        return parser_unexpected_field;
-
-    if (!parser_areEqual(amountToken + 1, "amount"))
-        return parser_unexpected_field;
-
-    if (!parser_areEqual(amountToken + 3, "denom"))
-        return parser_unexpected_field;
+    const char *amountPtr = parser_tx_obj.tx + parser_tx_obj.json.tokens[amountToken].start;
+    const uint16_t amountLen = parser_tx_obj.json.tokens[amountToken].end -
+                               parser_tx_obj.json.tokens[amountToken].start;
 
     char bufferUI[160];
     MEMZERO(outVal, outValLen);
     MEMZERO(bufferUI, sizeof(bufferUI));
 
-    const char *amountPtr = parser_tx_obj.tx + parser_tx_obj.json.tokens[amountToken + 2].start;
-    const uint16_t amountLen = parser_tx_obj.json.tokens[amountToken + 2].end -
-                               parser_tx_obj.json.tokens[amountToken + 2].start;
-    const char *denomPtr = parser_tx_obj.tx + parser_tx_obj.json.tokens[amountToken + 4].start;
-    const uint16_t denomLen = parser_tx_obj.json.tokens[amountToken + 4].end -
-                              parser_tx_obj.json.tokens[amountToken + 4].start;
-
-    if (sizeof(bufferUI) < amountLen + denomLen + 2) {
-        return parser_unexpected_buffer_end;
+    if (amountLen > 10) {
+        MEMCPY(bufferUI, amountPtr, amountLen-10);
+        bufferUI[amountLen-10] = '.';
+        MEMCPY(bufferUI + amountLen-9, amountPtr + amountLen-10, 10);
+    } else {
+        MEMCPY(bufferUI, "0.0000000000", 12);
+        MEMCPY(bufferUI + 12 - amountLen, amountPtr, amountLen);
     }
-
-    if (amountLen == 0) {
-        return parser_unexpected_buffer_end;
-    }
-
-    if (denomLen == 0) {
-        return parser_unexpected_buffer_end;
-    }
-
-    MEMCPY(bufferUI, amountPtr, amountLen);
-    bufferUI[amountLen] = ' ';
-    MEMCPY(bufferUI + 1 + amountLen, denomPtr, denomLen);
 
     pageString(outVal, outValLen, bufferUI, pageIdx, pageCount);
 

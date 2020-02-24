@@ -18,13 +18,9 @@
 
 #include <stdint.h>
 
-#define MENU_MAIN_APP_LINE1 "Cosmos"
+#define MENU_MAIN_APP_LINE1 "Waiting for"
+#define MENU_MAIN_APP_LINE2 "commands..."
 
-#ifdef TESTING_ENABLED
-#define MENU_MAIN_APP_LINE2 "Cosmos TEST!"
-#else
-#define MENU_MAIN_APP_LINE2 "App"
-#endif
 
 #define CUR_FLOW G_ux.flow_stack[G_ux.stack_count-1]
 
@@ -90,13 +86,9 @@ void splitValueField();
 
 void view_idle_show_impl();
 
-void view_address_show_impl();
-
 void view_error_show_impl();
 
 void view_sign_show_impl();
-
-void h_address_accept(unsigned int _);
 
 void h_error_accept(unsigned int _);
 

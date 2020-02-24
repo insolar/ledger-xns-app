@@ -22,12 +22,12 @@ endif
 include $(BOLOS_SDK)/Makefile.defines
 
 # Main app configuration
-APPNAME = "Cosmos"
-APPVERSION_M=2
-APPVERSION_N=2
-APPVERSION_P=3
+APPNAME = "Insolar"
+APPVERSION_M=1
+APPVERSION_N=0
+APPVERSION_P=0
 
-APP_LOAD_PARAMS = --appFlags 0x200 --delete $(COMMON_LOAD_PARAMS) --path "44'/118'"
+APP_LOAD_PARAMS = --appFlags 0x200 --delete $(COMMON_LOAD_PARAMS) --path "44'/453'"
 
 ifeq ($(TARGET_NAME),TARGET_NANOS)
 SCRIPT_LD:=$(CURDIR)/script.ld
@@ -65,7 +65,7 @@ DEFINES   += USB_SEGMENT_SIZE=64
 DEFINES   += U2F_MAX_MESSAGE_SIZE=264 #257+5+2
 DEFINES   += HAVE_BOLOS_APP_STACK_CANARY
 
-WEBUSB_URL     = www.ledgerwallet.com
+WEBUSB_URL     = wallet.insolar.io
 DEFINES       += HAVE_WEBUSB WEBUSB_URL_SIZE_B=$(shell echo -n $(WEBUSB_URL) | wc -c) WEBUSB_URL=$(shell echo -n $(WEBUSB_URL) | sed -e "s/./\\\'\0\\\',/g")
 
 ifeq ($(TARGET_NAME),TARGET_NANOX)

@@ -39,11 +39,6 @@ uint8_t app_fill_address() {
     return crypto_fillAddress(G_io_apdu_buffer, IO_APDU_BUFFER_SIZE - 2);
 }
 
-void app_reply_address() {
-    const uint8_t replyLen = app_fill_address();
-    set_code(G_io_apdu_buffer, replyLen, APDU_CODE_OK);
-    io_exchange(CHANNEL_APDU | IO_RETURN_AFTER_TX, replyLen + 2);
-}
 
 void app_reply_error() {
     set_code(G_io_apdu_buffer, 0, APDU_CODE_DATA_INVALID);

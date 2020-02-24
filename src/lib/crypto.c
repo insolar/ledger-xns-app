@@ -36,7 +36,7 @@ char bech32_hrp[MAX_BECH32_HRP_LEN + 1];
 #if defined(TARGET_NANOS) || defined(TARGET_NANOX)
 #include "cx.h"
 
-void crypto_extractPublicKey(uint32_t bip44Path[BIP44_LEN_DEFAULT], uint8_t *pubKey){
+uint16_t crypto_extractPublicKey(uint32_t bip44Path[BIP44_LEN_DEFAULT], uint8_t *pubKey) {
     cx_ecfp_public_key_t cx_publicKey;
     cx_ecfp_private_key_t cx_privateKey;
     uint8_t privateKeyData[32];
@@ -60,17 +60,8 @@ void crypto_extractPublicKey(uint32_t bip44Path[BIP44_LEN_DEFAULT], uint8_t *pub
         }
     }
     END_TRY;
-
-    // Format pubkey
-    for (int i = 0; i < 32; i++) {
-        pubKey[i] = cx_publicKey.W[64 - i];
-    }
-    cx_publicKey.W[0] = cx_publicKey.W[64] & 1 ? 0x03 : 0x02; // "Compress" public key in place
-    if ((cx_publicKey.W[32] & 1) != 0) {
-        pubKey[31] |= 0x80;
-    }
-    //////////////////////
-    memcpy(pubKey, cx_publicKey.W, PK_LEN);
+    memcpy(pubKey, cx_publicKey.W, cx_publicKey.W_len);
+    return cx_publicKey.W_len;
 }
 
 uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t *message, uint16_t messageLen) {
@@ -80,6 +71,7 @@ uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t
     cx_ecfp_private_key_t cx_privateKey;
     uint8_t privateKeyData[32];
     int signatureLength;
+
     BEGIN_TRY
     {
         TRY
@@ -113,11 +105,14 @@ uint16_t crypto_sign(uint8_t *signature, uint16_t signatureMaxlen, const uint8_t
 
     return signatureLength;
 }
+
+
 #else
 
-void crypto_extractPublicKey(uint32_t path[BIP32_LEN_DEFAULT], uint8_t *pubKey) {
+uint16_t crypto_extractPublicKey(uint32_t path[BIP32_LEN_DEFAULT], uint8_t *pubKey) {
     // Empty version for non-Ledger devices
     MEMZERO(pubKey, 32);
+    return 32;
 }
 
 uint16_t crypto_sign(uint8_t *signature,
@@ -167,17 +162,5 @@ uint16_t crypto_fillAddress(uint8_t *buffer, uint16_t buffer_len) {
     }
 
     // extract pubkey
-    crypto_extractPublicKey(bip44Path, buffer);
-
-    // Hash it
-    uint8_t hashed1_pk[CX_SHA256_SIZE];
-    cx_hash_sha256(buffer, PK_LEN, hashed1_pk, CX_SHA256_SIZE);
-
-    uint8_t hashed2_pk[CX_RIPEMD160_SIZE];
-    ripemd160_32(hashed2_pk, hashed1_pk);
-
-    char *addr = (char *) (buffer + PK_LEN);
-    bech32EncodeFromBytes(addr, bech32_hrp, hashed2_pk, CX_RIPEMD160_SIZE);
-
-    return PK_LEN + strlen(addr);
+    return crypto_extractPublicKey(bip44Path, buffer);
 }

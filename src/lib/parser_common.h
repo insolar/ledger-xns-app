@@ -43,12 +43,22 @@ typedef enum {
     parser_json_incomplete_json,    // "JSON string is not complete";
     parser_json_contains_whitespace,
     parser_json_is_not_sorted,
+
+    // todo remove
     parser_json_missing_chain_id,
     parser_json_missing_sequence,
     parser_json_missing_fee,
     parser_json_missing_msgs,
     parser_json_missing_account_number,
     parser_json_missing_memo,
+
+    // XNS transaction
+    parser_json_missing_method,
+    parser_json_unsupported_method,
+    parser_json_unexpected_params,
+    parser_json_missing_callsite,
+    parser_json_missing_seed,
+    parser_json_missing_public_key
 } parser_error_t;
 
 typedef struct {
@@ -56,6 +66,14 @@ typedef struct {
     uint16_t bufferLen;
     uint16_t offset;
 } parser_context_t;
+
+static const char* token_key_method = "method";
+static const char* token_key_params = "params";
+static const char* token_key_callsite = "callSite";
+static const char* token_key_callparams ="callParams";
+static const char* token_key_seed ="seed";
+static const char* token_key_public_key ="publicKey";
+
 
 #ifdef __cplusplus
 }

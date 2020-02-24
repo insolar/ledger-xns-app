@@ -20,35 +20,31 @@
 #include "lib/parser_impl.h"
 #include <zxmacros.h>
 
-#define NUM_REQUIRED_ROOT_PAGES 6
+#if defined(TARGET_NANOS) || defined(TARGET_NANOX)
+#include "os.h"
+#endif
+
+#define NUM_REQUIRED_ROOT_PAGES 2
 
 // Required pages
 const char *get_required_root_item(uint8_t i) {
     switch (i) {
         case 0:
-            return "chain_id";
+            return token_key_callsite;
         case 1:
-            return "account_number";
-        case 2:
-            return "sequence";
-        case 3:
-            return "fee";
-        case 4:
-            return "memo";
-        case 5:
-            return "msgs";
+            return token_key_callparams;
         default:
             return "?";
     }
 }
 
 static const uint16_t root_max_level[NUM_REQUIRED_ROOT_PAGES] = {
-        2, // "chain_id",
-        2, // "account_number",
-        2, // "sequence",
-        1, // "fee",
-        2, // "memo"
-        2, // "msgs"
+        1, // "callSite",
+        1, // "callParams",
+//        2, // "sequence",
+//        1, // "fee",
+//        2, // "memo"
+//        2, // "msgs"
 };
 
 typedef struct {
@@ -67,10 +63,18 @@ void _indexRootFields() {
     // Clear cache
     MEMZERO(&display_cache, sizeof(display_cache_t));
 
+    const int16_t  params_token_idx = object_get_value(&parser_tx_obj.json, ROOT_TOKEN_INDEX, token_key_params);
+    const int16_t  callsite_idx = object_get_value(&parser_tx_obj.json, params_token_idx, token_key_callsite);
+
+    // callParams depends on callSite value
+    // const int16_t  callparams_idx = object_get_value(&parser_tx_obj.json, params_token_idx, token_key_callparams);
+    // possible: amount, toMemberReference, ethTxHash, reference
+    // ===============
+
     // Calculate pages
     for (int8_t idx = 0; idx < NUM_REQUIRED_ROOT_PAGES; idx++) {
         const int16_t subroot_token_idx = object_get_value(&parser_tx_obj.json,
-                                                           ROOT_TOKEN_INDEX,
+                                                           params_token_idx,
                                                            get_required_root_item(idx));
 
         if (subroot_token_idx < 0) {
@@ -171,70 +175,19 @@ typedef struct {
 } key_subst_t;
 
 static const key_subst_t key_substitutions[NUM_KEY_SUBSTITUTIONS] = {
-        {"chain_id",                          "Chain ID"},
-        {"account_number",                    "Account"},
-        {"sequence",                          "Sequence"},
-        {"memo",                              "Memo"},
-        {"fee/amount",                        "Fee"},
-        {"fee/gas",                           "Gas"},
-        {"msgs/type",                         "Type"},
-
-        // FIXME: Are these obsolete?? multisend?
-        {"msgs/inputs/address",               "Source Address"},
-        {"msgs/inputs/coins",                 "Source Coins"},
-        {"msgs/outputs/address",              "Dest Address"},
-        {"msgs/outputs/coins",                "Dest Coins"},
-
-        // MsgSend
-        {"msgs/value/from_address",           "From"},
-        {"msgs/value/to_address",             "To"},
-        {"msgs/value/amount",                 "Amount"},
-
-        // MsgDelegate
-        {"msgs/value/delegator_address",      "Delegator"},
-        {"msgs/value/validator_address",      "Validator"},
-
-        // MsgUndelegate
-//        {"msgs/value/delegator_address", "Delegator"},
-//        {"msgs/value/validator_address", "Validator"},
-
-        // MsgBeginRedelegate
-//        {"msgs/value/delegator_address", "Delegator"},
-        {"msgs/value/validator_src_address",  "Validator Source"},
-        {"msgs/value/validator_dst_address",  "Validator Dest"},
-
-        // MsgSubmitProposal
-        {"msgs/value/description",            "Description"},
-        {"msgs/value/initial_deposit/amount", "Deposit Amount"},
-        {"msgs/value/initial_deposit/denom",  "Deposit Denom"},
-        {"msgs/value/proposal_type",          "Proposal"},
-        {"msgs/value/proposer",               "Proposer"},
-        {"msgs/value/title",                  "Title"},
-
-        // MsgDeposit
-        {"msgs/value/depositer",              "Sender"},
-        {"msgs/value/proposal_id",            "Proposal ID"},
-        {"msgs/value/amount",                 "Amount"},
-
-        // MsgVote
-        {"msgs/value/voter",                  "Description"},
-//        {"msgs/value/proposal_id",              "Proposal ID"},
-        {"msgs/value/option",                 "Option"},
-
-        // MsgWithdrawDelegationReward
-//        {"msgs/value/delegator_address", "Delegator"},      // duplicated
-//        {"msgs/value/validator_address", "Validator"},      // duplicated
+        {"callSite", "Command"},
+        {"callParams/amount", "Amount"},
+        {"callParams/toMemberReference", "To"},
+        {"callParams/reference", "Reference"},
+        {"callParams/ethTxHash", "Etherium TxHash"},
 };
 
 static const key_subst_t value_substitutions[NUM_VALUE_SUBSTITUTIONS] = {
-        {"cosmos-sdk/MsgSend",                     "Send"},
-        {"cosmos-sdk/MsgDelegate",                 "Delegate"},
-        {"cosmos-sdk/MsgUndelegate",               "Undelegate"},
-        {"cosmos-sdk/MsgBeginRedelegate",          "Redelegate"},
-        {"cosmos-sdk/MsgSubmitProposal",           "Propose"},
-        {"cosmos-sdk/MsgDeposit",                  "Deposit"},
-        {"cosmos-sdk/MsgVote",                     "Vote"},
-        {"cosmos-sdk/MsgWithdrawDelegationReward", "Withdraw Reward"},
+        {"member.transfer", "Send XNS"},
+        {"deposit.transfer", "Withdraw from deposit"},
+        {"member.create", "Create Account"},
+        {"member.migrationCreate", "Create Account"}, // this is Create Account with migration address
+        {"member.get", "Get Account Info"},
 };
 
 void tx_display_make_friendly() {

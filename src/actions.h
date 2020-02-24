@@ -24,6 +24,4 @@ void app_set_hrp(char *p);
 
 uint8_t app_fill_address();
 
-void app_reply_address();
-
 void app_reply_error();
