@@ -1,4 +1,4 @@
-# Cosmos App - Ledger Nano S
+# Insolar XNS App - Ledger Nano S
 ## General structure
 
 The general structure of commands and responses is as follows:
@@ -86,7 +86,7 @@ All other packets/chunks should contain message to sign
 | Field      | Type     | Content                | Expected  |
 | ---------- | -------- | ---------------------- | --------- |
 | Path[0]    | byte (4) | Derivation Path Data   | 44        |
-| Path[1]    | byte (4) | Derivation Path Data   | 118       |
+| Path[1]    | byte (4) | Derivation Path Data   | 453       |
 | Path[2]    | byte (4) | Derivation Path Data   | ?         |
 | Path[3]    | byte (4) | Derivation Path Data   | ?         |
 | Path[4]    | byte (4) | Derivation Path Data   | ?         |

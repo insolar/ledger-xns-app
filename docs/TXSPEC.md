@@ -7,15 +7,16 @@ Transactions passed to the Ledger device will be in the following format. The Le
 
 ```json
 {
-  "account_number": {number},
-  "chain_id": {string},
-  "fee": {
-    "amount": [{"amount": {number}, "denom": {string}}, ...],
-    "gas": {number}
-  },
-  "memo": {string},
-  "msgs": [{arbitrary}],
-  "sequence": {number}
+  "jsonrpc":"2.0",
+  "id":{number},
+  "method":"contract.call",
+  "params":
+    {
+      "callSite": {string},
+      "callParams": {...},
+      "publicKey": {string},
+      "seed": {string}
+    }
 }
 ```
 
@@ -24,38 +25,12 @@ Transactions passed to the Ledger device will be in the following format. The Le
 #### Examples
 
 ```json
+{"jsonrpc":"2.0","id":1,"method":"contract.call","params":{"callSite":"member.migrationCreate","publicKey":"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEc+Vs4y+XWE77LR0QL1e1wCOFePFEHJIB\ndsPWPKMH5zGRhRWV1HCJXajENCV2bdG/YKKEOAzTdE5BGXNg2dRQpQ==\n-----END PUBLIC KEY-----","seed":"rOpiqgDHHDmr2PfI5UzZiWpjRyDMoFtBNFoOwyC+yJ8="}}
 ```
 
 ```json
+{"jsonrpc":"2.0","id":1,"method":"contract.call","params":{"callSite":"member.transfer","callParams":{"amount":"24000000005","toMemberReference":"insolar:1AAEAATjWvxVC3DFEBqINu7JSKWxlcb_uJo7QdAHrcP8"},"reference":"insolar:1AAEAAY2zkW3pOTCIlYg6XqhWLR32AAeBpTKZ3vLdFhE","publicKey":"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEc+Vs4y+XWE77LR0QL1e1wCOFePFEHJIB\ndsPWPKMH5zGRhRWV1HCJXajENCV2bdG/YKKEOAzTdE5BGXNg2dRQpQ==\n-----END PUBLIC KEY-----","seed":"rOpiqgDHHDmr2PfI5UzZiWpjRyDMoFtBNFoOwyC+yJ8="}}
 ```
-
-#### Display Logic
-
-The Ledger device SHOULD pick a suitable display representation for the transaction.
-
-The key type (secp256k1 / ed25519), `chain_id`, `account_number`, `sequence`, `fee`, and `memo` should be displayed in that order, each on their own page, autoscrolling if necessary.
-
-`msgs` should be iterated through and each displayed according to the following recursive logic:
-
-```
-display (json, level)
-  if level == 2
-    show value as json-encoded string
-  else
-    switch typeof(json) {
-      case object:
-        for (key, value) in object:
-          show key
-          display(value, level + 1)
-      case array:
-        for element in array:
-          display(element, level + 1)
-      otherwise:
-        show value as json-encoded string
-    }
-```
-
-starting at level 0, e.g. `display(msgs[0], 0)`.
 
 ### Validation
 
@@ -66,20 +41,3 @@ We add the following two rules:
 - All dictionaries must be serialized in lexicographical key order
 
 This serves to prevent signature compatibility issues among different client libraries.
-
-This is equivalent to the following Python snippet:
-
-```python
-import json
-
-def ledger_validate(json_str):
-  obj = json.loads(json_str)
-  canonical = json.dumps(obj, sort_keys = True, separators = (',', ':'))
-  return canonical == json_str
-
-assert ledger_validate('{"a":2,"b":3}')
-assert ledger_validate('{"a ":2,"b":3}')
-assert not ledger_validate('{"a":2,\n"b":3}')
-assert not ledger_validate('{"b":2,"a":3}')
-assert not ledger_validate('{"a" : 2 }')
-```
