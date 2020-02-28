@@ -1,4 +1,4 @@
-# Insolar XNS Ledger Nanon S/X
+# Insolar XNS Ledger Nano S
 
 https://wallet.insolar.io
 
